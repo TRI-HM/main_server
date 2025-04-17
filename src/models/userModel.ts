@@ -2,8 +2,8 @@ import { DataTypes } from "sequelize";
 import SequelizeDB from "../database/db";
 
 export const UserModelSequelize = SequelizeDB.define("userModel", {
-  id: {
-    type: DataTypes.STRING,
+  uuid: {
+    type: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true
   },
@@ -36,3 +36,13 @@ export const UserModelSequelize = SequelizeDB.define("userModel", {
     type: DataTypes.DATE(),
   }
 });
+
+type UserModelSequelizeType = Omit<typeof UserModelSequelize, 'createdAt' | 'updatedAt'>;
+
+export interface IUserModel {
+  create: (user: UserModelSequelizeType) => Promise<IUserModel>; //Todo: create it
+  update: (user: UserModelSequelizeType) => Promise<IUserModel>;
+  getUser: (uuid: string) => Promise<IUserModel>;
+  getAllUsers: () => Promise<IUserModel[]>;
+  delete: (uuid: string) => Promise<IUserModel>;
+}

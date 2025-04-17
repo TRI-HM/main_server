@@ -2,12 +2,11 @@ import { createServer } from 'http';
 import express from 'express';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import SocketsManager from './listeners/socketsManager';
 import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error';
 import routes from './routes';
-dotenv.config();
+import SequelizeDB from './database/db';
 
 const app = express();
 app.use(cors());
@@ -32,6 +31,18 @@ io.on('connection', (socket) => {
 
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+const StartServer = () => {
+  SequelizeDB.authenticate()
+    .then(() => {
+      console.log('✅ Database connected successfully!');
+      httpServer.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('❌ Unable to connect to the database:', err);
+    }
+    );
+};
+StartServer();

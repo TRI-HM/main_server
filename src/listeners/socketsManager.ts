@@ -1,10 +1,9 @@
 import { Socket, Server } from "socket.io"
 
 const SocketsManager = (socket: Socket, io: Server) => {
-  console.log("New socket connected with id:", socket.id)
-
+  console.log("🌟 New socket connected with id:", socket.id)
   socket.on("disconnect", () => {
-    console.log("Disconnected from id:", socket.id)
+    console.log("❌ Disconnected from id:", socket.id)
   })
 
   socket.on('ping', (msg) => {

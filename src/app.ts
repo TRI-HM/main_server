@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import SocketsManager from './listeners/socketsManager';
 import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error';
+import routes from './routes';
 dotenv.config();
 
 const app = express();
@@ -15,6 +16,8 @@ app.use(errorHandler);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use('/api', routes);
+
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
@@ -23,7 +26,6 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST'],
   },
 });
-
 io.on('connection', (socket) => {
   SocketsManager(socket, io);
 });

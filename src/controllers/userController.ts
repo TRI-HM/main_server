@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { UserClientType, UserModelType } from "../models/userModel";
-import { UUIDV4 } from "sequelize";
 import userService from "../services/userService";
 
 const router = Router();
@@ -27,5 +26,25 @@ router.post("/create",
     }
     res.send(newUser as UserModelType);
   });
+
+// PUT /api/user/update/:uuid
+router.patch("/update/:uuid",
+  async (req, res) => {
+    let user: UserClientType = {
+      fullname: req.body.fullname,
+      phone: req.body.phone,
+      email: req.body.email,
+      gift: req.body.gift,
+      note: req.body.note,
+    };
+    let uuid: string = req.params.uuid;
+    let updatedUser = await userService.update(uuid, user);
+    if (!updatedUser) {
+      console.log("User update failed");
+      // return res.status(500).json({ message: "User update failed" }); //Todo : handle error properly. Create wrapper for error handling
+    }
+    res.send(true);
+  });
+
 
 export default router;

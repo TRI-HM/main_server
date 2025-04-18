@@ -8,8 +8,16 @@ const createUser = (useCase: IUserUseCase) =>
     return newUser;
   }
 
+const updateUser = (useCase: IUserUseCase) =>
+  async (uuid: string, user: UserClientType): Promise<boolean> => {
+    let updatedUser = await useCase.update(uuid, user);
+    if (!updatedUser) return false;
+    return true;
+  }
+
 const userService: IUserUseCase = {
   create: createUser(userUseCase),
+  update: updateUser(userUseCase),
 }
 
 export default userService;

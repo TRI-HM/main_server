@@ -1,4 +1,5 @@
 import { Socket, Server } from "socket.io"
+import userListener from "./user/user"
 
 const SocketsManager = (socket: Socket, io: Server) => {
   console.log("🌟 New socket connected with id:", socket.id)
@@ -10,6 +11,9 @@ const SocketsManager = (socket: Socket, io: Server) => {
     console.log('ping received:', msg);
     socket.emit('pong', 'pong');
   });
+
+  userListener(socket, io);
+
 }
 
 export default SocketsManager

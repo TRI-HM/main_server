@@ -2,10 +2,10 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UsersModel', {
-      id: {
-        type: Sequelize.UUIDV4,
-        allowNull: false,
+    await queryInterface.createTable('Users', {
+      uuid: {
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         primaryKey: true
       },
       fullname: {
@@ -16,7 +16,7 @@ module.exports = {
         type: Sequelize.STRING(15),
         allowNull: false,
       },
-      mail: {
+      email: {
         type: Sequelize.STRING(100),
       },
       gift: {
@@ -39,6 +39,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UsersModel');
+    await queryInterface.dropTable('Users');
   }
 };

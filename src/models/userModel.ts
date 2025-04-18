@@ -1,10 +1,10 @@
 import { DataTypes } from "sequelize";
 import SequelizeDB from "../database/db";
 
-export const UserModelSequelize = SequelizeDB.define("userModel", {
+export const UserModelSequelize = SequelizeDB.define("user", {
   uuid: {
-    type: DataTypes.UUIDV4,
-    allowNull: false,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
   fullname: {
@@ -15,7 +15,7 @@ export const UserModelSequelize = SequelizeDB.define("userModel", {
     type: DataTypes.STRING(15),
     allowNull: false,
   },
-  mail: {
+  email: {
     type: DataTypes.STRING(100),
   },
   gift: {
@@ -37,12 +37,33 @@ export const UserModelSequelize = SequelizeDB.define("userModel", {
   }
 });
 
-type UserModelSequelizeType = Omit<typeof UserModelSequelize, 'createdAt' | 'updatedAt'>;
+export type UserModelType = {
+  uuid: string;
+  fullname: string;
+  phone: string;
+  email?: string;
+  gift?: string;
+  note?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date;
+};
+export type UserClientType = Omit<UserModelType, 'createdAt' | 'updatedAt' | 'deletedAt' | 'uuid'>;
 
-export interface IUserModel {
-  create: (user: UserModelSequelizeType) => Promise<IUserModel>; //Todo: create it
-  update: (user: UserModelSequelizeType) => Promise<IUserModel>;
-  getUser: (uuid: string) => Promise<IUserModel>;
-  getAllUsers: () => Promise<IUserModel[]>;
-  delete: (uuid: string) => Promise<IUserModel>;
+export interface IUserUseCase {
+  create: (user: UserClientType) => Promise<UserModelType | null>; //Todo: create it
+  // update: (user: UserClientType) => Promise<UserModelSequelizeType>;
+  // getUser: (uuid: string) => Promise<UserModelSequelizeType>;
+  // getAllUsers: () => Promise<UserModelSequelizeType[]>;
+  // delete: (uuid: string) => Promise<UserModelSequelizeType>;
+}
+
+const createUser = async (user: UserClientType): Promise<UserModelType | null> => {
+  const newUser = await UserModelSequelize.create(user);
+  if (!newUser) return null;
+  return newUser.dataValues as UserModelType;
+}
+
+export const userUseCase: IUserUseCase = {
+  create: createUser
 }

@@ -14,7 +14,6 @@ const SequelizeDB = new Sequelize(
     define: {
       timestamps: true,
       underscored: false,
-      freezeTableName: true,
       paranoid: true,
     },
     timezone: "+07:00",

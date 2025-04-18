@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io"
-import userListener from "./user/user"
+import userListener from "./user/controller"
 
 const SocketsManager = (socket: Socket, io: Server) => {
   console.log("🌟 New socket connected with id:", socket.id)

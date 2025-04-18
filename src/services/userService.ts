@@ -15,9 +15,25 @@ const updateUser = (useCase: IUserUseCase) =>
     return true;
   }
 
+const getOneUser = (useCase: IUserUseCase) =>
+  async (uuid: string): Promise<UserModelType | null> => {
+    let user = await useCase.getOne(uuid);
+    if (!user) return null;
+    return user;
+  }
+
+const getAllUsers = (useCase: IUserUseCase) =>
+  async (): Promise<UserModelType[] | null> => {
+    let users = await useCase.getAll();
+    if (!users) return null;
+    return users;
+  }
+
 const userService: IUserUseCase = {
   create: createUser(userUseCase),
   update: updateUser(userUseCase),
+  getOne: getOneUser(userUseCase),
+  getAll: getAllUsers(userUseCase),
 }
 
 export default userService;

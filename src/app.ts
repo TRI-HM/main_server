@@ -5,7 +5,7 @@ import cors from 'cors';
 import SocketsManager from './listeners/socketsManager';
 import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error';
-import routes from './routes';
+import routes from './domain/routes';
 import SequelizeDB from './database/db';
 
 const app = express();

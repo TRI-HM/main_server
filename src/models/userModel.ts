@@ -53,9 +53,9 @@ export type UserClientType = Omit<UserModelType, 'createdAt' | 'updatedAt' | 'de
 export interface IUserUseCase {
   create: (user: UserClientType) => Promise<UserModelType | null>;
   update: (uuid: string, user: UserClientType) => Promise<boolean>;
-  // getUser: (uuid: string) => Promise<UserModelSequelizeType>;
-  // getAllUsers: () => Promise<UserModelSequelizeType[]>;
-  // delete: (uuid: string) => Promise<UserModelSequelizeType>;
+  getOne: (uuid: string) => Promise<UserModelType | null>;
+  getAll: () => Promise<UserModelType[] | null>;
+  // delete: (uuid: string) => Promise<UserModelType | null>;
 }
 
 const createUser = async (user: UserClientType): Promise<UserModelType | null> => {
@@ -72,9 +72,22 @@ const updateUser = async (uuid: string, user: UserClientType): Promise<boolean> 
   return true;
 }
 
+const getOneUser = async (uuid: string): Promise<UserModelType | null> => {
+  const user = await UserModelSequelize.findOne({ where: { uuid } });
+  if (!user) return null;
+  return user.dataValues as UserModelType;
+}
+
+const getAllUsers = async (): Promise<UserModelType[] | null> => {
+  const users = await UserModelSequelize.findAll();
+  if (!users) return null;
+  return users.map(user => user.dataValues as UserModelType);
+}
 
 
 export const userUseCase: IUserUseCase = {
   create: createUser,
-  update: updateUser
+  update: updateUser,
+  getOne: getOneUser,
+  getAll: getAllUsers
 }

@@ -1,7 +1,9 @@
 import { Response, Request, Router } from "express";
 import { IUserUseCase, UserClientType, UserModelType } from "../../models/userModel";
 import userService from "../../services/userService";
-import { wrapAsync } from "../../util/wrapAsync";
+import { wrapAsync } from "../../middleware/wrapAsync";
+import io from "../../util/io";
+import { StatusCodes } from "http-status-codes";
 
 const router = Router();
 
@@ -22,11 +24,7 @@ const create = wrapAsync(
 
     let newUser = await userService.create(user);
     if (!newUser) {
-      console.log("User creation failed");
-      res
-        .status(500)
-        .json({ message: "User creation failed" }); //Todo : handle error properly. Create wrapper for error handling
-      return;
+      throw new Error("User creation failed");
     }
     res.send(newUser as UserModelType);
     return;
@@ -46,8 +44,9 @@ const update = wrapAsync(
     let updatedUser = await userService.update(uuid, user);
     if (!updatedUser) {
       console.log("User update failed");
-      res.send(false); //Todo : handle error properly. Create wrapper for error handling
-      // return res.status(500).json({ message: "User update failed" }); //Todo : handle error properly. Create wrapper for error handling
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json(io.toResponseError({ code: 500, message: "User update failed" }));
       return;
     }
     res.send(true);
@@ -60,7 +59,7 @@ const getOne = wrapAsync(
     let user = await userService.getOne(uuid);
     if (!user) {
       console.log("User not found");
-      res.send(false); //Todo : handle error properly. Create wrapper for error handling
+      res.send(false);
       return;
     }
     res.send(user as UserModelType);

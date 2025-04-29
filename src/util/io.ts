@@ -1,0 +1,24 @@
+type ErrorType = {
+  code: number;
+  message: string;
+};
+
+type toResponseType = {
+  statusCode: number;
+  message: string;
+  data?: any;
+}
+
+const toResponseError = (error: ErrorType, data?: any): toResponseType => {
+  return {
+    statusCode: error.code,
+    message: error.message,
+    data,
+  };
+}
+
+const io = {
+  toResponseError,
+};
+
+export default io;

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { wrapAsync } from "../../middleware/wrapAsync";
+import imageService from "./service";
 
 const getOne = wrapAsync(
   async (req: Request, res: Response) => {
@@ -10,7 +11,7 @@ const getOne = wrapAsync(
       res.send(false);
       return;
     }
-    res.send(image as ImageModelType);
+    res.sendFile;
     return;
   }
 );

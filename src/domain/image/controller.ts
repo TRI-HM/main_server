@@ -38,7 +38,42 @@ const getOne = wrapAsync(
   }
 );
 
+const upload = wrapAsync(
+  async (req: Request, res: Response) => {
+    try {
+      // Lấy thông tin từ form
+      const description = req.body.description;
+      console.log('description: ', req.body);
+
+      // Lấy thông tin file đã upload
+      // const uploadedFile = req.file;
+
+      // if (!uploadedFile) {
+      //   res.status(400).json({ success: false, message: 'Không có file nào được gửi lên' });
+      // }
+
+      // // Trả về thông tin hình ảnh đã lưu
+      // res.status(200).json({
+      //   success: true,
+      //   message: 'Upload thành công',
+      //   data: {
+      //     filename: uploadedFile.filename,
+      //     originalName: uploadedFile.originalname,
+      //     path: uploadedFile.path,
+      //     size: uploadedFile.size,
+      //     description: description
+      //   }
+      // });
+
+    } catch (error) {
+      console.error('Lỗi khi xử lý upload:', error);
+      res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+  }
+)
+
 const imageController = {
   getOne,
+  upload,
 };
 export default imageController;

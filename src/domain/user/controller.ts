@@ -79,10 +79,27 @@ const getAll = wrapAsync(
   }
 );
 
+// const updateVote = wrapAsync(
+//   async (req: Request, res: Response) => {
+//     let phone: string = req.params.phone;
+//     let vote: string = req.body.vote;
+//     let updatedUser = await userService.updateVote(phone, vote);
+//     if (!updatedUser) {
+//       console.log("User update failed");
+//       res
+//         .status(StatusCodes.INTERNAL_SERVER_ERROR)
+//         .json(io.toResponseError({ code: 500, message: "User update failed" }));
+//       return;
+//     }
+//     res.send(true);
+//     return
+//   });
+
 const userController = {
   create,
   update,
   getOne,
   getAll,
+  // updateVote
 };
 export default userController;

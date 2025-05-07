@@ -41,7 +41,6 @@ const getOne = wrapAsync(
 const upload = wrapAsync(
   async (req: Request, res: Response) => {
     try {
-      // Kiểm tra xem file có tồn tại không
       if (!req.file) {
         res.status(400).json({
           success: false,
@@ -50,22 +49,19 @@ const upload = wrapAsync(
         return;
       }
 
-      // Lấy thông tin từ form
       const description = req.body.description || 'Không có mô tả';
 
-      // Thông tin về file đã tải lên
       const fileInfo = {
         filename: req.file.filename,
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
-        path: req.file.path,
+        url: `${process.env.BASE_URL}/images/uploads/${req.file.filename}`, // Đường dẫn đến ảnh đã tải lên
         description: description
       };
 
       console.log('File đã tải lên:', fileInfo);
 
-      // Trả về kết quả thành công
       res.status(200).json({
         success: true,
         message: 'Tải lên ảnh thành công',

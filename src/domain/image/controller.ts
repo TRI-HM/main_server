@@ -41,36 +41,47 @@ const getOne = wrapAsync(
 const upload = wrapAsync(
   async (req: Request, res: Response) => {
     try {
+      // Kiểm tra xem file có tồn tại không
+      if (!req.file) {
+        res.status(400).json({
+          success: false,
+          message: 'Không có file ảnh nào được tải lên'
+        });
+        return;
+      }
+
       // Lấy thông tin từ form
-      const description = req.body.description;
-      console.log('description: ', req.body);
+      const description = req.body.description || 'Không có mô tả';
 
-      // Lấy thông tin file đã upload
-      // const uploadedFile = req.file;
+      // Thông tin về file đã tải lên
+      const fileInfo = {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: req.file.path,
+        description: description
+      };
 
-      // if (!uploadedFile) {
-      //   res.status(400).json({ success: false, message: 'Không có file nào được gửi lên' });
-      // }
+      console.log('File đã tải lên:', fileInfo);
 
-      // // Trả về thông tin hình ảnh đã lưu
-      // res.status(200).json({
-      //   success: true,
-      //   message: 'Upload thành công',
-      //   data: {
-      //     filename: uploadedFile.filename,
-      //     originalName: uploadedFile.originalname,
-      //     path: uploadedFile.path,
-      //     size: uploadedFile.size,
-      //     description: description
-      //   }
-      // });
+      // Trả về kết quả thành công
+      res.status(200).json({
+        success: true,
+        message: 'Tải lên ảnh thành công',
+        data: fileInfo
+      });
 
     } catch (error) {
-      console.error('Lỗi khi xử lý upload:', error);
-      res.status(500).json({ success: false, message: 'Lỗi server' });
+      console.error('Lỗi khi tải lên ảnh:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Đã xảy ra lỗi khi tải lên ảnh',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   }
-)
+);
 
 const imageController = {
   getOne,

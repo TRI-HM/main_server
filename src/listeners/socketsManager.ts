@@ -1,5 +1,6 @@
 import { Socket, Server } from "socket.io"
 import userListener from "./user/controller"
+import bigScreen from "./show-big-screen/controller"
 
 const SocketsManager = (socket: Socket, io: Server) => {
   console.log("🌟 New socket connected with id:", socket.id)
@@ -13,6 +14,7 @@ const SocketsManager = (socket: Socket, io: Server) => {
   });
 
   userListener(socket, io);
+  bigScreen(socket, io);
 
 }
 

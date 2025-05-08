@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { wrapAsync } from "../../middleware/wrapAsync";
 import axios from "axios";
+import path from "path";
+import fs from "fs";
 
 const getOne = wrapAsync(
   async (req: Request, res: Response) => {
@@ -80,8 +82,28 @@ const upload = wrapAsync(
   }
 );
 
+const getAll = wrapAsync(
+  async (req: Request, res: Response) => {
+    const imagesDir = path.join(__dirname, "../../../public/images/uploads");
+    try {
+      if (!fs.existsSync(imagesDir)) {
+        console.error("❌ Thư mục không tồn tại:", imagesDir);
+      }
+      const files = await fs.promises.readdir(imagesDir);
+      const imageFiles = files.filter(file =>
+        /\.(jpg|jpeg|png|gif)$/i.test(file)
+      );
+
+      res.status(200).json({ images: imageFiles });
+    } catch (error) {
+      res.status(500).json({ error: "Unable to fetch images" });
+    }
+  }
+)
+
 const imageController = {
   getOne,
   upload,
+  getAll
 };
 export default imageController;

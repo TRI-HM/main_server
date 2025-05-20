@@ -5,13 +5,13 @@ import fs from "fs";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Tạo thư mục lưu trữ file upload nếu chưa tồn tại
-    const uploadsDir = path.join(__dirname, '../../uploads');
+    const uploadsDir = path.join(__dirname, '../../public/images/uploads');
     console.log('uploadsDir', uploadsDir);
     // Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo mới
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
-    cb(null, 'uploads/'); // Đường dẫn thư mục lưu trữ file upload
+    cb(null, 'public/images/uploads/'); // Đường dẫn thư mục lưu trữ file upload
   },
   // Đặt tên file lưu trữ theo định dạng: timestamp-randomNumber-originalName
   filename: function (req, file, cb) {

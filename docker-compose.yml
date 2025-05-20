@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:9456"
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=3309
+      - DB_NAME=main_server
+      - DB_USERNAME=root
+      - DB_PASSWORD=Admin123
+      - DB_DIALECT=mysql
+      - PORT=9456
+    depends_on:
+      - db
+    # restart: always
+    command: >
+      sh -c "sleep 5 && npm start"
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3309:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=Admin123
+      - MYSQL_DATABASE=main_server
+    volumes:
+      - mysql_data:/var/lib/mysql
+    # restart: always #unless-stopped
+    healthcheck:
+      test:
+        ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pAdmin123"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

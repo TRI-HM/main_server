@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { wrapAsync } from "../../middleware/wrapAsync";
 import axios from "axios";
-import path from "path";
-import fs from "fs";
 
 const getOne = wrapAsync(
   async (req: Request, res: Response) => {
@@ -43,6 +41,7 @@ const getOne = wrapAsync(
 const upload = wrapAsync(
   async (req: Request, res: Response) => {
     try {
+      // Kiểm tra xem file có tồn tại không
       if (!req.file) {
         res.status(400).json({
           success: false,
@@ -51,8 +50,10 @@ const upload = wrapAsync(
         return;
       }
 
+      // Lấy thông tin từ form
       const description = req.body.description || 'Không có mô tả';
 
+      // Thông tin về file đã tải lên
       const fileInfo = {
         filename: req.file.filename,
         originalname: req.file.originalname,
@@ -65,6 +66,7 @@ const upload = wrapAsync(
 
       console.log('File đã tải lên:', fileInfo);
 
+      // Trả về kết quả thành công
       res.status(200).json({
         success: true,
         message: 'Tải lên ảnh thành công',
@@ -82,28 +84,8 @@ const upload = wrapAsync(
   }
 );
 
-const getAll = wrapAsync(
-  async (req: Request, res: Response) => {
-    const imagesDir = path.join(__dirname, "../../../public/images/uploads");
-    try {
-      if (!fs.existsSync(imagesDir)) {
-        console.error("❌ Thư mục không tồn tại:", imagesDir);
-      }
-      const files = await fs.promises.readdir(imagesDir);
-      const imageFiles = files.filter(file =>
-        /\.(jpg|jpeg|png|gif)$/i.test(file)
-      );
-
-      res.status(200).json({ images: imageFiles });
-    } catch (error) {
-      res.status(500).json({ error: "Unable to fetch images" });
-    }
-  }
-)
-
 const imageController = {
   getOne,
   upload,
-  getAll
 };
 export default imageController;

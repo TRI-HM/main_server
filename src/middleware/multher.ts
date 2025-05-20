@@ -1,21 +1,22 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadsDir = path.join(__dirname, '../../public/images/uploads');
+    // Tạo thư mục lưu trữ file upload nếu chưa tồn tại
+    const uploadsDir = path.join(__dirname, '../../uploads');
+    console.log('uploadsDir', uploadsDir);
+    // Kiểm tra xem thư mục đã tồn tại chưa, nếu chưa thì tạo mới
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
-    cb(null, uploadsDir);
+    cb(null, 'uploads/'); // Đường dẫn thư mục lưu trữ file upload
   },
+  // Đặt tên file lưu trữ theo định dạng: timestamp-randomNumber-originalName
   filename: function (req, file, cb) {
-    const uniqueSuffix = uuidv4();
-    const filename = path.parse(file.originalname).name;
-    const fileExtension = path.extname(file.originalname);
-    cb(null, filename + '-' + uniqueSuffix + fileExtension); // Tên file lưu trữ
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname); // Tên file lưu trữ
   }
 });
 

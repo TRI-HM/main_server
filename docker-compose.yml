@@ -17,7 +17,7 @@ services:
       - db
     # restart: always
     command: >
-      sh -c "sleep 5 && npm start"
+      sh -c "sleep 15 && npm start"
 
   db:
     image: mysql:8.0
@@ -26,6 +26,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=Admin123
       - MYSQL_DATABASE=main_server
+      # - MYSQL_USER=root
+      # - MYSQL_PASSWORD=Admin123
     volumes:
       - mysql_data:/var/lib/mysql
     # restart: always #unless-stopped

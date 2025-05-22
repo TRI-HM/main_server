@@ -26,8 +26,6 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=Admin123
       - MYSQL_DATABASE=main_server
-      # - MYSQL_USER=root
-      # - MYSQL_PASSWORD=Admin123
     volumes:
       - mysql_data:/var/lib/mysql
     # restart: always #unless-stopped

@@ -1,10 +1,12 @@
+# docker-compose.yml
+# This file is used to define and run multi-container Docker applications.
 version: "3.8"
 
 services:
   app:
     build: .
     ports:
-      - "9456:9456"
+      - "9456:3000" # Expose port 3000 of the app to port 9456 on the host
     env_file:
       - .env
     environment:

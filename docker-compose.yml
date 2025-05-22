@@ -5,6 +5,8 @@ services:
     build: .
     ports:
       - "9456:9456"
+    env_file:
+      - .env
     environment:
       - DB_HOST=db
       - DB_PORT=3306
@@ -16,7 +18,7 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "sleep 5 && npm start"
+      sh -c "sleep 15 && npm start"
 
   db:
     image: mysql:8.0
@@ -28,7 +30,8 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pAdmin123"]
+      test:
+        ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pAdmin123"]
       interval: 5s
       timeout: 5s
       retries: 5

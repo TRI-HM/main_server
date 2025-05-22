@@ -26,6 +26,6 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "nodemon --exec ts-node --files src/app.ts"
+    "start": "npx sequelize-cli db:migrate && nodemon --exec ts-node --files src/app.ts"
   }
 }

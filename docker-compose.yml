@@ -20,7 +20,9 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "sleep 15 && npm start"
+      sh -c "until nc -z db 3306; do echo Waiting for MySQL...; sleep 2; done &&
+         npx sequelize-cli db:migrate &&
+         nodemon --exec ts-node --files src/app.ts"
 
   db:
     image: mysql:8.0

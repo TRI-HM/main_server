@@ -35,7 +35,12 @@ export const UserModelSequelize = SequelizeDB.define("user", {
   deletedAt: {
     type: DataTypes.DATE(),
   }
-});
+},
+  {
+    tableName: "users",
+    freezeTableName: true,
+  }
+);
 
 export type UserModelType = {
   uuid: string;

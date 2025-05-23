@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import SequelizeDB from "../database/db";
 
-export const UserModelSequelize = SequelizeDB.define("User", {
+export const UserModelSequelize = SequelizeDB.define("user", {
   uuid: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -37,7 +37,7 @@ export const UserModelSequelize = SequelizeDB.define("User", {
   }
 },
   {
-    tableName: "Users",
+    tableName: "users",
     freezeTableName: true,
   }
 );

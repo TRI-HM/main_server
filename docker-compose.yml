@@ -22,7 +22,7 @@ services:
     command: >
       sh -c "until nc -z db 3306; do echo Waiting for MySQL...; sleep 2; done &&
          npx sequelize-cli db:migrate &&
-         nodemon --exec ts-node --files src/app.ts"
+         ts-node src/app.ts"
 
   db:
     image: mysql:8.0

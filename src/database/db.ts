@@ -8,7 +8,7 @@ const SequelizeDB = new Sequelize(
   DBConfig.PASSWORD,
   {
     host: DBConfig.HOST,
-    dialect: DBConfig.DIALECT as any,
+    dialect: "mysql",
     port: DBConfig.PORT,
     logging: false,
     define: {

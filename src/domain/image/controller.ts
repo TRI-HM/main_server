@@ -59,7 +59,8 @@ const upload = wrapAsync(
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
         size: req.file.size,
-        path: req.file.path,
+        url: `${process.env.BASE_URL}/images/uploads/${req.file.filename}`, // Đường dẫn đến ảnh đã tải lên
+        qrcode: `${process.env.BASE_URL_QRCODE}/user?id=${req.file.filename}`, // Đường dẫn đến ảnh đã tải lên
         description: description
       };
 

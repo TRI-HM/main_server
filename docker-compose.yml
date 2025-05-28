@@ -6,7 +6,7 @@ services:
   app:
     build: .
     ports:
-      - "9456:3000" # Expose port 3000 of the app to port 9456 on the host
+      - "9456:9456" # Expose port 3000 of the app to port 9456 on the host
     env_file:
       - .env
     environment:

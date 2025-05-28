@@ -14,6 +14,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Copy startup script
+COPY wait-for-db.sh /wait-for-db.sh
 RUN chmod +x /wait-for-db.sh
 
 # Build TypeScript code

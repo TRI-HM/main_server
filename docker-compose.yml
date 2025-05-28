@@ -20,7 +20,7 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "sleep 30 && npm start"
+      sh -c "sleep 30 && /wait-for-db.sh db && npm start"
 
   db:
     image: mysql:8.0

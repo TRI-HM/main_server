@@ -7,6 +7,7 @@ import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error';
 import routes from './domain/routes';
 import SequelizeDB from './database/db';
+import path from 'path';
 
 const app = express();
 app.use(cors());
@@ -16,6 +17,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/api', routes);
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
 
 const httpServer = createServer(app);
 

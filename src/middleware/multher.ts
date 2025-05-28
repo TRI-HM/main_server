@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
   },
   // Đặt tên file lưu trữ theo định dạng: timestamp-randomNumber-originalName
   filename: function (req, file, cb) {
-    const uniqueSuffix = generateUniqueFileNameByTime(); // Tạo tên file duy nhất
+    const uniqueSuffix = generateUniqueFileNameByTime(); // Tạo tên file duy nhất với timestamp và số ngẫu nhiên
     cb(null, uniqueSuffix + '-' + file.originalname); // Tên file lưu trữ
   }
 });

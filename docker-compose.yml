@@ -12,6 +12,7 @@ services:
     env_file:
       - .env
     environment:
+      - BASE_URL=http://171.244.143.124:9456
       - DB_HOST=db
       - DB_PORT=3306
       - DB_NAME=main_server

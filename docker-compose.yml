@@ -20,13 +20,7 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "
-       set -e;
-       until mysql -h \"$DB_HOST\" -u\"$DB_USERNAME\" -p\"$DB_PASSWORD\" -e 'use $DB_NAME'; do
-         echo 'Database is unavailable - sleeping';
-         sleep 2;
-       done;
-       npm start;"
+      sh -c "sleep 60 && npm start"
 
   db:
     image: mysql:8.0

@@ -42,7 +42,7 @@ const create = async (win: GameVitaminClientType): Promise<GameVitaminModelType 
 }
 
 const getOne = async (id: number): Promise<GameVitaminModelType | null> => {
-  const row = await GameVitaminModelSequelize.findOne({ where: { id } });
+  const row = await GameVitaminModelSequelize.findByPk(id);
   if (!row) return null;
   return row.dataValues as GameVitaminModelType;
 }

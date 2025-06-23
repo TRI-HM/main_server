@@ -8,7 +8,7 @@ const create = (useCase: IGameVitaminUseCase) =>
   }
 
 const getOne = (useCase: IGameVitaminUseCase) =>
-  async (id: string): Promise<GameVitaminModelType | null> => {
+  async (id: number): Promise<GameVitaminModelType | null> => {
     let row = await useCase.getOne(id);
     if (!row) return null;
     return row;

@@ -28,15 +28,24 @@ const create = wrapAsync(
 
 const getOne = wrapAsync(
   async (req: Request, res: Response) => {
-    let id: string = req.params.uuid;
-    let row = await vitaminService.getOne(id);
-    if (!row) {
-      console.log("Row not found");
-      res.send(false);
+    let id: string = req.params.id;
+    try {
+      let idNum = parseInt(id, 10);
+      console.log("Received id param:", idNum);
+      let row = await vitaminService.getOne(idNum);
+      if (!row) {
+        console.log("Row not found");
+        res.send(false);
+        return;
+      }
+      res.send(row as GameVitaminModelType);
+      return;
+    } catch (error) {
+      console.log("Invalid ID format");
+      res.status(400).send("Invalid ID format");
       return;
     }
-    res.send(row as GameVitaminModelType);
-    return;
+
   });
 
 const getAll = wrapAsync(

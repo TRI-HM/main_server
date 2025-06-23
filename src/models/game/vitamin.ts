@@ -31,17 +31,17 @@ export type GameVitaminClientType = Omit<GameVitaminModelType, 'id' | 'createdAt
 
 export interface IGameVitaminUseCase {
   create: (win: GameVitaminClientType) => Promise<GameVitaminModelType | null>;
-  getOne: (id: string) => Promise<GameVitaminModelType | null>;
+  getOne: (id: number) => Promise<GameVitaminModelType | null>;
   getAll: () => Promise<GameVitaminModelType[] | null>;
 }
-
+``
 const create = async (win: GameVitaminClientType): Promise<GameVitaminModelType | null> => {
   const newRow = await GameVitaminModelSequelize.create(win);
   if (!newRow) return null;
   return newRow.dataValues as GameVitaminModelType;
 }
 
-const getOne = async (id: string): Promise<GameVitaminModelType | null> => {
+const getOne = async (id: number): Promise<GameVitaminModelType | null> => {
   const row = await GameVitaminModelSequelize.findOne({ where: { id } });
   if (!row) return null;
   return row.dataValues as GameVitaminModelType;

@@ -1,4 +1,4 @@
-import { GameVitaminClientType, GameVitaminModelSequelize, GameVitaminModelType, gameVitaminUseCase, IGameVitaminUseCase } from "../../../models/game/vitamin";
+import { GameVitaminClientType, GameVitaminModelType, gameVitaminUseCase, IGameVitaminUseCase } from "../../../models/game/vitamin";
 
 const create = (useCase: IGameVitaminUseCase) =>
   async (win: GameVitaminClientType): Promise<GameVitaminModelType | null> => {

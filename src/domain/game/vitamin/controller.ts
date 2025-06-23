@@ -31,7 +31,6 @@ const getOne = wrapAsync(
     let id: string = req.params.id;
     try {
       let idNum = parseInt(id, 10);
-      console.log("After parseInt:", idNum, "isInteger:", Number.isInteger(idNum));
       let row = await vitaminService.getOne(idNum);
       if (!row) {
         console.log("Row not found");

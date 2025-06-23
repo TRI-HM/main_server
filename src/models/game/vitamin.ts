@@ -18,6 +18,9 @@ export const GameVitaminModelSequelize = SequelizeDB.define("vitamin", {
     type: DataTypes.DATE(),
     allowNull: false
   },
+  deletedAt: {
+    type: DataTypes.DATE(),
+  },
 });
 
 export type GameVitaminModelType = {
@@ -27,14 +30,14 @@ export type GameVitaminModelType = {
   updatedAt: Date;
 };
 
-export type GameVitaminClientType = Omit<GameVitaminModelType, 'id' | 'createdAt' | 'updatedAt'>;
+export type GameVitaminClientType = Omit<GameVitaminModelType, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
 
 export interface IGameVitaminUseCase {
   create: (win: GameVitaminClientType) => Promise<GameVitaminModelType | null>;
   getOne: (id: number) => Promise<GameVitaminModelType | null>;
   getAll: () => Promise<GameVitaminModelType[] | null>;
 }
-``
+
 const create = async (win: GameVitaminClientType): Promise<GameVitaminModelType | null> => {
   const newRow = await GameVitaminModelSequelize.create(win);
   if (!newRow) return null;
@@ -42,9 +45,16 @@ const create = async (win: GameVitaminClientType): Promise<GameVitaminModelType 
 }
 
 const getOne = async (id: number): Promise<GameVitaminModelType | null> => {
-  const row = await GameVitaminModelSequelize.findByPk(id);
-  if (!row) return null;
-  return row.dataValues as GameVitaminModelType;
+  try {
+    console.log("Fetching row with ID: ", id);
+    const row = await GameVitaminModelSequelize.findByPk(id);
+    console.log("Row found: ", row);
+    if (!row) return null;
+    return row.dataValues as GameVitaminModelType;
+  } catch (error) {
+    console.error("❌ Error when fetching vitamin:", error);
+    throw error;
+  }
 }
 
 const getAll = async (): Promise<GameVitaminModelType[] | null> => {

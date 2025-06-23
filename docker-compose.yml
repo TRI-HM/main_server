@@ -23,7 +23,7 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "/init-db.sh npm start"
+      sh -c "./init-db.sh npm start"
 
   db:
     image: mysql:8.0

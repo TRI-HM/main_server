@@ -14,8 +14,6 @@ RUN npm install
 # Copy source code
 COPY . .
 
-RUN chmod +x /init-db.sh
-
 # Build TypeScript code
 # RUN npm run build
 

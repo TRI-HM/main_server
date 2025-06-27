@@ -21,4 +21,4 @@ COPY . .
 EXPOSE 9456
 
 # Start the application
-CMD ["npm", "start"] 
+CMD ["npm", "start"]

@@ -19,6 +19,10 @@ app.use(express.static('public'));
 app.use('/api', routes);
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
+const httpsOptions = {
+  key: path.join(__dirname, '../key.pem'),
+  cert: path.join(__dirname, '../cert.pem'),
+};
 
 const httpServer = createServer(app);
 

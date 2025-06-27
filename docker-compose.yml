@@ -6,13 +6,15 @@ services:
   app:
     build: .
     ports:
-      - "9456:9456" # Expose port 3000 of the app to port 9456 on the host
+      - "9456:9456" # HTT
     volumes:
       - /home/mysql/upload/images:/usr/src/app/public/images/uploads
+      - ../cert.pem:/usr/src/app/cert.pem # Mount certificate từ VPS
+      - ../key.pem:/usr/src/app/key.pem # Mount private key từ VPS
     env_file:
       - .env
     environment:
-      - BASE_URL=http://171.244.143.124:9456
+      - BASE_URL=https://171.244.143.124:9456
       - DB_HOST=db
       - DB_PORT=3306
       - DB_NAME=main_server
@@ -20,6 +22,7 @@ services:
       - DB_PASSWORD=Admin123
       - DB_DIALECT=mysql
       - PORT=9456
+      - HTTPS_PORT=9456
     depends_on:
       - db
     command: >

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>EUGICA</title>
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes" />
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    #unity-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #231f20;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <script src="Build/Ver9-Demo.loader.js"></script>
+  <script src="./fullscreen.js"></script>
+  <script>
+    createUnityInstance(document.querySelector("#unity-canvas"), {
+      dataUrl: "Build/Ver9-Demo.data",
+      frameworkUrl: "Build/Ver9-Demo.framework.js",
+      codeUrl: "Build/Ver9-Demo.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "CreativVN",
+      productName: "EUGICA",
+      productVersion: "0.1",
+    });
+  </script>
+</body>
+
+</html>

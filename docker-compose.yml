@@ -24,6 +24,7 @@ services:
       - db
     command: >
       sh -c "sleep 60 && npm start"
+    restart: always
 
   db:
     image: mysql:8.0
@@ -40,18 +41,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin_container
     restart: always
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: db
-      MYSQL_ROOT_PASSWORD: Admin123
-    depends_on:
-      - db
+
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin
+  #   container_name: phpmyadmin_container
+  #   restart: always
+  #   ports:
+  #     - "8080:80"
+  #   environment:
+  #     PMA_HOST: db
+  #     MYSQL_ROOT_PASSWORD: Admin123
+  #   depends_on:
+  #     - db
 
 volumes:
   mysql_data:

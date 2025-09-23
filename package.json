@@ -28,6 +28,8 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "npx sequelize-cli db:migrate && nodemon --exec ts-node --files src/app.ts"
+    "start": "npx sequelize-cli db:migrate && nodemon --exec ts-node --files src/app.ts",
+    "test:realEstate": "ts-node scripts/runTests.ts",
+    "test:mock": "ts-node scripts/runTests.ts"
   }
 }

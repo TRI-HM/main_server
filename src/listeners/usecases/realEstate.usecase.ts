@@ -1,19 +1,34 @@
-import { Server, Socket } from "socket.io";
+// Khi báo phần model
+type RealEstate = {
+  id: string;
+  idEmployee?: string;
+  block: string;
+  floor: string;
+  apartment: string;
+  location: string;
+  status: string;
+  note?: string;
+}
 
-// Interface cho usecase với Higher-order functions
+// Interface cho useCase với Higher-order functions
 export interface IRealEstateUseCase {
-  ping: (useCase: IRealEstateUseCase) => (socket: Socket, server: Server) => Promise<void>;
+  ping: (useCase: IRealEstateUseCase) => () => Promise<boolean>;
 }
 
 const ping = (useCase: IRealEstateUseCase) =>
-  async (socket: Socket, io: Server): Promise<void> => {
-    console.log('realEstateUseCase.ping called');
-    // Gọi xuống tầng dưới nếu cần thiết ở đây. 
-    return new Promise<void>((resolve) => {
-      console.log('realEstate:ping received from usecase');
-      // resolve();
-      socket.emit('realEstate:pingResponse', { message: 'Pong from useCase' });
-    });
+  async (): Promise<boolean> => {
+    console.log('💼 UseCase layer executing - pure business logic');
+
+    // Pure business logic here:
+    // - Data processing
+    // - Business rules
+    // - Domain logic
+    // - No socket, no HTTP, no external concerns
+
+    // Simulate some business logic
+    const isSystemHealthy = true;
+
+    return isSystemHealthy;
   }
 
 const realEstateUseCase: IRealEstateUseCase = {

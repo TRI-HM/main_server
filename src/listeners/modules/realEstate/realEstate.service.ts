@@ -1,16 +1,15 @@
 import { Server, Socket } from "socket.io";
-import { IRealEstateUseCase } from "../../usecases/realEstate.usecase";
+import realEstateUseCase, { IRealEstateUseCase } from "../../useCases/realEstate.useCase";
 
-const ping = (useCase: IRealEstateUseCase) =>
+const ping = (service: IRealEstateUseCase) =>
   async (socket: Socket, io: Server): Promise<void> => {
-    // Gọi xuống tầng dưới nếu cần thiết ở đây. 
-    return new Promise<void>((resolve) => {
-      console.log('realEstate:ping received');
-      resolve();
-    });
+    // Gọi xuống usecase layer
+    console.log('realEstate:ping received at service');
+    return realEstateUseCase.ping(realEstateUseCase)(socket, io);
   }
 
 const realEstateService: IRealEstateUseCase = {
   ping,
 };
+
 export default realEstateService;

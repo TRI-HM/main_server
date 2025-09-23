@@ -11,7 +11,7 @@ const ping = (useCase: IRealEstateUseCase) =>
     // Gọi xuống tầng dưới nếu cần thiết ở đây. 
     return new Promise<void>((resolve) => {
       console.log('realEstate:ping received from usecase');
-      resolve();
+      // resolve();
       socket.emit('realEstate:pingResponse', { message: 'Pong from useCase' });
     });
   }

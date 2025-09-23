@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import userService from "../../services/userService";
+import userService from "../../../services/userService";
 
 const userListener = (socket: Socket, io: Server) => {
   socket.on("user:login", (data) => {

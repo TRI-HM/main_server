@@ -3,6 +3,7 @@ import realEstateService from "../../modules/realEstate/realEstate.service";
 import { wrapAsyncSocket } from "../../../middleware/wrapAsyncSocket";
 import { RealEstateApartmentClientType } from "../../../models/realEstate.apartment";
 import realEstateUseCase from "../../useCases/realEstate.useCases";
+import { validateApartmentData } from "../../../middleware/realEstate.validationSchema";
 
 const realEstate = wrapAsyncSocket(
   async (socket: Socket, io: Server) => {
@@ -51,7 +52,17 @@ const realEstate = wrapAsyncSocket(
     socket.on('realEstate:create', async (data: Partial<RealEstateApartmentClientType>) => {
       console.log('🎯 Controller received realEstate:create event with data:', data);
       try {
-        const result = await realEstateService.create(data);
+        const validation = await validateApartmentData(data);
+        if (!validation.isValid) {
+          console.log('❌ Validation failed:', validation.errors);
+          return socket.emit('realEstate:createResponse', {
+            success: false,
+            message: 'Validation failed',
+            errors: validation.errors,
+            timestamp: new Date().toISOString()
+          });
+        }
+        const result = await realEstateService.create(validation.validatedData);
         console.log('✅ Successfully created new real estate');
         return socket.emit('realEstate:createResponse', {
           success: true,

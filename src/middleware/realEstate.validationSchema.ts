@@ -33,29 +33,26 @@ export const validateApartmentData = (data: Partial<RealEstateApartmentClientTyp
     }
   });
 
-  validateEnumFieldApartment(data, errors, ['status', 'location']);
+  if (data.status && data.status.toString().trim() !== '' && !Object.values(VALIDATION_STATUS).includes(data.status as VALIDATION_STATUS)) {
+    errors.push({
+      field: 'status',
+      message: `status must be one of ${Object.values(VALIDATION_STATUS).join(', ')}`
+    });
+  }
+  if (data.location && data.location.toString().trim() !== '' && !Object.values(VALIDATION_LOCATION).includes(data.location as VALIDATION_LOCATION)) {
+    errors.push({
+      field: 'location',
+      message: `location must be one of ${Object.values(VALIDATION_LOCATION).join(', ')}`
+    });
+  }
 
+  if (errors.length > 0) {
+    return {
+      isValid: false, errors, validatedData: {}
+    };
+  }
 
   const validatedData: Partial<RealEstateApartmentClientType> = { ...data };
 
-  return { isValid: true, errors, validatedData };
+  return { isValid: true, errors: [], validatedData };
 }
-
-function validateEnumFieldApartment(
-  data: Partial<RealEstateApartmentClientType>,
-  errors: IValidationError[],
-  fieldsToValidate: (keyof RealEstateApartmentClientType)[],
-  validationEnum: typeof VALIDATION_STATUS // TODO: thêm enum khác
-): void {
-
-  fieldsToValidate = fieldsToValidate || ['status', 'location'];
-  fieldsToValidate.forEach(field => {
-    if (data[field] && !Object.values(VALIDATION_STATUS).includes(data[field] as VALIDATION_STATUS)) {
-      errors.push({
-        field,
-        message: `${field} must be one of ${Object.values(VALIDATION_STATUS).join(', ')}`
-      });
-    }
-  });
-}
-

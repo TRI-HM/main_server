@@ -1,8 +1,7 @@
 import { RealEstateApartmentClientType, RealEstateApartmentModelSequelize, RealEstateApartmentModelType } from "../../models/realEstate.apartment";
-import { RealEstateStaffModelSequelize } from "../../models/realEstate.staff";
 
 export interface IRealEstateUseCase {
-  create: (data: Partial<RealEstateApartmentClientType>) => Promise<RealEstateApartmentClientType>;
+  create: (data: Partial<RealEstateApartmentClientType>) => Promise<RealEstateApartmentModelType>;
   // useCase tracking
   // clicked: (useCase: IRealEstateUseCase) => (id: string) => Promise<number>;
   // timeSpent: (useCase: IRealEstateUseCase) => (id: string, seconds: number) => Promise<number>;

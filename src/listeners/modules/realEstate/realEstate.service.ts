@@ -1,10 +1,10 @@
-import { RealEstateApartmentClientType } from "../../../models/realEstate.apartment";
+import { RealEstateApartmentClientType, RealEstateApartmentModelType } from "../../../models/realEstate.apartment";
 import realEstateUseCase, { IRealEstateUseCase } from "../../useCases/realEstate.useCases";
 
 export interface IRealEstateService extends IRealEstateUseCase { }
 
 const create = (service: IRealEstateService) =>
-  async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentClientType> => {
+  async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentModelType> => {
     return service.create(data);
   }
 

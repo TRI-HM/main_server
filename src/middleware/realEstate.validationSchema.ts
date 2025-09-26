@@ -23,15 +23,15 @@ export const validateApartmentData = (data: Partial<RealEstateApartmentClientTyp
 } => {
   const errors: IValidationError[] = [];
 
-  const requiredFields: (keyof RealEstateApartmentClientType)[] = ['idStaff', 'block', 'floor', 'apartment', 'location', 'status'];
-  requiredFields.forEach(field => {
-    if (!data[field] || data[field]?.toString().trim() === '') {
-      errors.push({
-        field,
-        message: `${field} is required and cannot be empty`
-      })
-    }
-  });
+  // const requiredFields: (keyof RealEstateApartmentClientType)[] = ['idStaff', 'block', 'floor', 'apartment', 'location', 'status'];
+  // requiredFields.forEach(field => {
+  //   if (!data[field] || data[field]?.toString().trim() === '') {
+  //     errors.push({
+  //       field,
+  //       message: `${field} is required and cannot be empty`
+  //     })
+  //   }
+  // });
 
   if (data.status && data.status.toString().trim() !== '' && !Object.values(VALIDATION_STATUS).includes(data.status as VALIDATION_STATUS)) {
     errors.push({
@@ -52,7 +52,16 @@ export const validateApartmentData = (data: Partial<RealEstateApartmentClientTyp
     };
   }
 
-  const validatedData: Partial<RealEstateApartmentClientType> = { ...data };
+  const validatedData: Partial<RealEstateApartmentClientType> = {
+    id: data.id?.toString().trim(),
+    idStaff: data.idStaff?.toString().trim(),
+    block: data.block?.toString().trim(),
+    floor: data.floor?.toString().trim(),
+    apartment: data.apartment?.toString().trim(),
+    location: data.location?.toString().trim(),
+    status: data.status?.toString().trim(),
+    note: data.note?.toString().trim(),
+  };
 
   return { isValid: true, errors: [], validatedData };
 }

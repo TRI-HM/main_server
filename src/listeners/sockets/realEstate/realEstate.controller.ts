@@ -55,7 +55,6 @@ const realEstate = wrapAsyncSocket(
         });
       }
     });
-    // Todo : fix update
     socket.on('realEstate:update', async (data: Partial<RealEstateApartmentClientType>) => {
       console.log('🎯 Controller received realEstate:update event with data:', data)
       const { id, ...updateData } = data;
@@ -67,7 +66,19 @@ const realEstate = wrapAsyncSocket(
             timestamp: new Date().toISOString()
           });
         }
-        const result = await realEstateService.update(id, updateData);
+
+        const validation = await validateApartmentData(updateData);
+        if (!validation.isValid) {
+          console.log('❌ Validation failed:', validation.errors);
+          return socket.emit('realEstate:updateResponse', {
+            success: false,
+            message: 'Validation failed',
+            errors: validation.errors,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        const result = await realEstateService.update(id, validation.validatedData);
         if (!result) {
           console.log('❌ Real estate not found for id:', id);
           return socket.emit('realEstate:updateResponse', {

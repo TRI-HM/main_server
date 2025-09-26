@@ -58,25 +58,33 @@ const realEstate = wrapAsyncSocket(
     // Todo : fix update
     socket.on('realEstate:update', async (data: Partial<RealEstateApartmentClientType>) => {
       console.log('🎯 Controller received realEstate:update event with data:', data)
+      const { id, ...updateData } = data;
       try {
-        const result = await realEstateService.update(data);
-        if (!result) {
-          console.log('❌ Real estate not found for id:', data.id);
+        if (!id) {
           return socket.emit('realEstate:updateResponse', {
             success: false,
-            message: `Real estate not found for id: ${data.id}`,
+            message: 'ID is required for update',
             timestamp: new Date().toISOString()
           });
         }
-        console.log('✅ Successfully updated real estate for id:', data.id);
+        const result = await realEstateService.update(id, updateData);
+        if (!result) {
+          console.log('❌ Real estate not found for id:', id);
+          return socket.emit('realEstate:updateResponse', {
+            success: false,
+            message: `Real estate not found for id: ${id}`,
+            timestamp: new Date().toISOString()
+          });
+        }
+        console.log('✅ Successfully updated real estate for id:', id);
         return socket.emit('realEstate:updateResponse', {
           success: true,
-          message: `Updated real estate for id: ${data.id}`,
+          message: `Updated real estate for id: ${id}`,
           data: result,
           timestamp: new Date().toISOString()
         });
       } catch (error) {
-        console.error('❌ Error updating real estate for id:', data.id, error);
+        console.error('❌ Error updating real estate for id:', id, error);
         return socket.emit('realEstate:updateResponse', {
           success: false,
           message: 'Server error occurred',

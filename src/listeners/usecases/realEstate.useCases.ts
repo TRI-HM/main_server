@@ -3,7 +3,7 @@ import { RealEstateApartmentClientType, RealEstateApartmentModelSequelize, RealE
 export interface IRealEstateUseCase {
   create: (data: Partial<RealEstateApartmentClientType>) => Promise<RealEstateApartmentModelType>;
   all: () => Promise<RealEstateApartmentModelType[] | null>;
-  update: (data: Partial<RealEstateApartmentClientType>) => Promise<RealEstateApartmentModelType | null>;
+  update: (id: string, data: Partial<RealEstateApartmentClientType>) => Promise<boolean>;
 }
 
 const create = async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentModelType> => {
@@ -17,11 +17,10 @@ const all = async (): Promise<RealEstateApartmentModelType[] | null> => {
   return apartments.map(a => a.dataValues as RealEstateApartmentModelType);
 }
 
-const update = async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentModelType | null> => {
-  let apartment = await RealEstateApartmentModelSequelize.update(data, { where: { id: data.id }, returning: true }).then(([rowsUpdate, [updatedApartment]]) => updatedApartment);
-  console.log('💼 UseCase layer executing - pure business logic', apartment);
-  if (!apartment) return null;
-  return apartment.dataValues as RealEstateApartmentModelType;
+const update = async (id: string, data: Partial<RealEstateApartmentClientType>): Promise<boolean> => {
+  let [updated] = await RealEstateApartmentModelSequelize.update(data, { where: { id } });
+  console.log('💼 UseCase layer executing - pure business logic', updated);
+  return updated > 0;
 }
 
 const realEstateUseCase: IRealEstateUseCase = {

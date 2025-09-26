@@ -13,10 +13,11 @@ const all = (service: IRealEstateService) =>
     return service.all();
   }
 
-const update = (service: IRealEstateService) =>
-  async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentModelType | null> => {
-    return service.update(data);
-  }
+const update = (useCase: IRealEstateService) =>
+  async (id: string, data: Partial<RealEstateApartmentClientType>): Promise<boolean> => {
+    console.log('🏢 Service layer executing update for ID:', id);
+    return useCase.update(id, data);
+  };
 
 const realEstateService: IRealEstateService = {
   create: create(realEstateUseCase),

@@ -10,7 +10,6 @@ module.exports = {
       },
       idStaff: {
         type: Sequelize.STRING,
-        allowNull: false,
         references: {
           model: 'real_estate_staffs',
           key: 'id'
@@ -40,7 +39,6 @@ module.exports = {
       },
       note: {
         type: Sequelize.STRING,
-        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,

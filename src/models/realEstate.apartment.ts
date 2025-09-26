@@ -8,7 +8,6 @@ export const RealEstateApartmentModelSequelize = SequelizeDB.define("real_estate
   },
   idStaff: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
   block: {
     type: DataTypes.STRING,
@@ -32,7 +31,6 @@ export const RealEstateApartmentModelSequelize = SequelizeDB.define("real_estate
   },
   note: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
   createdAt: {
     type: DataTypes.DATE(),
@@ -49,13 +47,13 @@ export const RealEstateApartmentModelSequelize = SequelizeDB.define("real_estate
 
 export type RealEstateApartmentModelType = {
   id: string;
-  idStaff: string;
+  idStaff?: string;
   block: string;
   floor: string;
   apartment: string;
   location: string;
   status: string;
-  note: string;
+  note?: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;

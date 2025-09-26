@@ -77,7 +77,7 @@ const realEstate = wrapAsyncSocket(
             timestamp: new Date().toISOString()
           });
         }
-        
+
         const result = await realEstateService.update(id, validation.validatedData);
         if (!result) {
           console.log('❌ Real estate not found for id:', id);
@@ -88,7 +88,7 @@ const realEstate = wrapAsyncSocket(
           });
         }
         console.log('✅ Successfully updated real estate for id:', id);
-        return socket.emit('realEstate:updateResponse', {
+        return socket.broadcast.emit('realEstate:updateResponse', {
           success: true,
           message: `Updated real estate for id: ${id}`,
           data: result,

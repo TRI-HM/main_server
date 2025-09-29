@@ -1,9 +1,10 @@
 import { RealEstateApartmentClientType, RealEstateApartmentModelSequelize, RealEstateApartmentModelType } from "../../models/realEstate.apartment";
 
-export interface IRealEstateUseCase {
+export interface IRealEstateApartmentUseCase {
   create: (data: Partial<RealEstateApartmentClientType>) => Promise<RealEstateApartmentModelType>;
   all: () => Promise<RealEstateApartmentModelType[] | null>;
   update: (id: string, data: Partial<RealEstateApartmentClientType>) => Promise<boolean>;
+  findById: (id: string) => Promise<RealEstateApartmentModelType | null>;
 }
 
 const create = async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentModelType> => {
@@ -23,10 +24,17 @@ const update = async (id: string, data: Partial<RealEstateApartmentClientType>):
   return updated > 0;
 }
 
-const realEstateUseCase: IRealEstateUseCase = {
+const findById = async (id: string): Promise<RealEstateApartmentModelType | null> => {
+  let apartment = await RealEstateApartmentModelSequelize.findOne({ where: { id } });
+  if (!apartment) return null;
+  return apartment.dataValues as RealEstateApartmentModelType;
+}
+
+const realEstateApartmentUseCase: IRealEstateApartmentUseCase = {
   create,
   all,
   update,
+  findById
 }
 
-export default realEstateUseCase; 
+export default realEstateApartmentUseCase; 

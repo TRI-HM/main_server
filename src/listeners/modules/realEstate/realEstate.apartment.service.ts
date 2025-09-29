@@ -1,7 +1,7 @@
 import { RealEstateApartmentClientType, RealEstateApartmentModelType } from "../../../models/realEstate.apartment";
-import realEstateUseCase, { IRealEstateUseCase } from "../../useCases/realEstate.useCases";
+import realEstateApartmentUseCase, { IRealEstateApartmentUseCase } from "../../useCases/realEstate.useCases";
 
-export interface IRealEstateService extends IRealEstateUseCase { }
+export interface IRealEstateService extends IRealEstateApartmentUseCase { }
 
 const create = (service: IRealEstateService) =>
   async (data: Partial<RealEstateApartmentClientType>): Promise<RealEstateApartmentModelType> => {
@@ -19,10 +19,16 @@ const update = (useCase: IRealEstateService) =>
     return useCase.update(id, data);
   };
 
-const realEstateService: IRealEstateService = {
-  create: create(realEstateUseCase),
-  all: all(realEstateUseCase),
-  update: update(realEstateUseCase),
+const findById = (service: IRealEstateService) =>
+  async (id: string): Promise<RealEstateApartmentModelType | null> => {
+    return service.findById(id);
+  }
+
+const realEstateApartmentService: IRealEstateService = {
+  create: create(realEstateApartmentUseCase),
+  all: all(realEstateApartmentUseCase),
+  update: update(realEstateApartmentUseCase),
+  findById: findById(realEstateApartmentUseCase)
 };
 
-export default realEstateService;
+export default realEstateApartmentService;

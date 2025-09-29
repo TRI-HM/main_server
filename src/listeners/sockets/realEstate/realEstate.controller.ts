@@ -90,7 +90,7 @@ const realEstate = wrapAsyncSocket(
           });
         }
         console.log('✅ Successfully updated real estate for id:', id);
-        return socket.broadcast.emit('realEstate:updateResponse', {
+        return socket.broadcast.emit('realEstate:isChangeResponse', {
           success: true,
           message: `Updated real estate for id: ${id}`,
           data: result,
@@ -124,7 +124,7 @@ const realEstate = wrapAsyncSocket(
 
         const result = await realEstateViewService.create(dataView);
         console.log('✅ Successfully created new real estate view');
-        return socket.emit('realEstate:createResponse', {
+        return socket.broadcast.emit('realEstate:isChangeResponse', {
           success: true,
           message: `Created new real estate view`,
           data: result,
@@ -143,7 +143,7 @@ const realEstate = wrapAsyncSocket(
       console.log('🎯 Controller received realEstate:all:view event');
       try {
         const result = await realEstateViewService.all();
-        return socket.emit('realEstate:allResponse', {
+        return socket.emit('realEstate:all:viewResponse', {
           success: true,
           message: `Retrieved all real estate views`,
           data: result,
@@ -151,7 +151,7 @@ const realEstate = wrapAsyncSocket(
         });
       } catch (error) {
         console.error('❌ Error retrieving all real estate views:', error);
-        return socket.emit('realEstate:allResponse', {
+        return socket.emit('realEstate:all:viewResponse', {
           success: false,
           message: 'Server error occurred',
           error: error instanceof Error ? error.message : 'Unknown error'

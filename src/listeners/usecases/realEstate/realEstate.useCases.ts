@@ -1,4 +1,4 @@
-import { RealEstateApartmentClientType, RealEstateApartmentModelSequelize, RealEstateApartmentModelType } from "../../models/realEstate.apartment";
+import { RealEstateApartmentClientType, RealEstateApartmentModelSequelize, RealEstateApartmentModelType } from "../../../models/realEstate.apartment";
 
 export interface IRealEstateApartmentUseCase {
   create: (data: Partial<RealEstateApartmentClientType>) => Promise<RealEstateApartmentModelType>;

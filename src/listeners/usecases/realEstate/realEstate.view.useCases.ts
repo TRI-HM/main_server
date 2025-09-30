@@ -1,5 +1,5 @@
-import { RealEstateApartmentModelSequelize } from "../../models/realEstate.apartment";
-import { RealEstateViewsClientType, RealEstateViewsModelSequelize, RealEstateViewsModelType } from "../../models/realEstate.views";
+import { RealEstateApartmentModelSequelize } from "../../../models/realEstate.apartment";
+import { RealEstateViewsClientType, RealEstateViewsModelSequelize, RealEstateViewsModelType } from "../../../models/realEstate.views";
 
 export interface IRealEstateViewUseCase {
   all: () => Promise<RealEstateViewsModelType[] | null>;

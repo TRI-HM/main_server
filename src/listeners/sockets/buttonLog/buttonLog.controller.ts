@@ -5,9 +5,9 @@ import { ButtonLogClientType } from "../../../models/buttonLog/buttonLog.model";
 
 const buttonLogController = wrapAsyncSocket(
   async (socket: Socket, io: Server) => {
-    socket.on('clickLog:buttonClick', async (data: { button1?: boolean, button2?: boolean, button3?: boolean, button4?: boolean }) => {
+    socket.on('clickLog:create', async (data: { button1?: boolean, button2?: boolean, button3?: boolean, button4?: boolean }) => {
       try {
-        console.log('🔔 Controller received clickLog:buttonClick event with data:', data);
+        console.log('🔔 Controller received clickLog:create event with data:', data);
 
         let newData: ButtonLogClientType = {
           button1: data.button1 || false,
@@ -17,16 +17,16 @@ const buttonLogController = wrapAsyncSocket(
         };
 
         const result = await buttonLogService.logButtonClick(newData);
-        console.log('🎯 Controller received clickLog:buttonClick event with data:', newData);
-        socket.emit('clickLog:buttonClickResponse', {
+        console.log('🎯 Controller received clickLog:create event with data:', newData);
+        socket.emit('clickLog:createResponse', {
           success: true,
           message: `Created new button log`,
           data: result,
           timestamp: new Date().toISOString()
         });
       } catch (error) {
-        console.error('Error handling clickLog:buttonClick event:', error);
-        socket.emit('clickLog:buttonClickResponse', {
+        console.error('Error handling clickLog:create event:', error);
+        socket.emit('clickLog:createResponse', {
           success: false,
           message: `Failed to create button log`,
           error: 'Server error occurred',

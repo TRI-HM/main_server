@@ -90,7 +90,7 @@ const realEstate = wrapAsyncSocket(
           });
         }
         console.log('✅ Successfully updated real estate for id:', id);
-        return socket.broadcast.emit('realEstate:isChangeResponse', {
+        return socket.broadcast.emit('realEstate:updateResponse', {
           success: true,
           message: `Updated real estate for id: ${id}`,
           data: result,
@@ -113,7 +113,7 @@ const realEstate = wrapAsyncSocket(
         const apartment = await realEstateApartmentService.findById(apartmentId);
         if (!apartment) {
           console.log('❌ Apartment not found for id:', apartmentId);
-          return socket.emit('realEstate:createResponse', {
+          return socket.emit('realEstate:create:viewResponse', {
             success: false,
             message: `Apartment not found for id: ${apartmentId}`,
             timestamp: new Date().toISOString()
@@ -124,7 +124,7 @@ const realEstate = wrapAsyncSocket(
 
         const result = await realEstateViewService.create(dataView);
         console.log('✅ Successfully created new real estate view');
-        return socket.broadcast.emit('realEstate:isChangeResponse', {
+        return socket.broadcast.emit('realEstate:create:viewResponse', {
           success: true,
           message: `Created new real estate view`,
           data: result,
@@ -132,7 +132,7 @@ const realEstate = wrapAsyncSocket(
         });
       } catch (error) {
         console.error('❌ Error creating real estate view:', error);
-        return socket.emit('realEstate:createResponse', {
+        return socket.emit('realEstate:create:viewResponse', {
           success: false,
           message: 'Server error occurred',
           error: error instanceof Error ? error.message : 'Unknown error'

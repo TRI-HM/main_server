@@ -18,7 +18,7 @@ const buttonLogController = wrapAsyncSocket(
 
         const result = await buttonLogService.logButtonClick(newData);
         console.log('🎯 Controller received clickLog:create event with data:', newData);
-        socket.emit('clickLog:createResponse', {
+        socket.broadcast.emit('clickLog:createResponse', {
           success: true,
           message: `Created new button log`,
           data: result,

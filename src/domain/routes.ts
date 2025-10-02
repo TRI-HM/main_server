@@ -2,6 +2,7 @@ import { Router } from "express";
 import userRouter from "./user/route";
 import imageRouter from "./image/route";
 import vitaminRouter from "./game/vitamin/route";
+import loginRouter from "./login/route";
 
 const router = Router();
 
@@ -11,6 +12,7 @@ router.get("/ping", (req, res) => {
 
 router.use("/user", userRouter);
 router.use("/image", imageRouter);
-router.use("/game/vitamin", vitaminRouter)
+router.use("/game/vitamin", vitaminRouter);
+router.use("/login", loginRouter);
 
 export default router;

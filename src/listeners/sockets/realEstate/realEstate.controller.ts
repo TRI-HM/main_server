@@ -90,7 +90,7 @@ const realEstate = wrapAsyncSocket(
           });
         }
         console.log('✅ Successfully updated real estate for id:', id);
-        return socket.broadcast.emit('realEstate:updateResponse', {
+        return io.emit('realEstate:updateResponse', {
           success: true,
           message: `Updated real estate for id: ${id}`,
           data: result,

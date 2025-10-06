@@ -1,5 +1,5 @@
 import { ButtonLogClientType, ButtonLogModelType } from "../../../models/buttonLog/buttonLog.model";
-import buttonLogUseCase, { IButtonLogUseCase } from "../../useCases/buttonLog/buttonLog.useCase";
+import buttonLogUseCase, { IButtonLogUseCase } from "../../useCase/buttonLog/buttonLog.useCase";
 
 export interface IButtonLogService extends IButtonLogUseCase { }
 

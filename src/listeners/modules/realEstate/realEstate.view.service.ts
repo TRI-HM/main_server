@@ -1,5 +1,5 @@
 import { RealEstateViewsClientType, RealEstateViewsModelType } from "../../../models/realEstate.views";
-import realEstateViewUseCase, { IRealEstateViewUseCase } from "../../useCases/realEstate/realEstate.view.useCases";
+import realEstateViewUseCase, { IRealEstateViewUseCase } from "../../useCase/realEstate/realEstate.view.useCases";
 
 export interface IRealEstateViewService extends IRealEstateViewUseCase { }
 

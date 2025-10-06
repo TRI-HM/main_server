@@ -124,7 +124,7 @@ const realEstate = wrapAsyncSocket(
 
         const result = await realEstateViewService.create(dataView);
         console.log('✅ Successfully created new real estate view');
-        return socket.broadcast.emit('realEstate:create:viewResponse', {
+        return io.emit('realEstate:create:viewResponse', {
           success: true,
           message: `Created new real estate view`,
           data: result,

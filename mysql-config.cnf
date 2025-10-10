@@ -1,0 +1,60 @@
+# MySQL Configuration for 1GB RAM VPS
+# Place this file as mysql-config.cnf
+
+[mysqld]
+# Basic settings
+default_authentication_plugin = mysql_native_password
+sql_mode = TRADITIONAL
+
+# Memory optimizations for 1GB RAM system
+# InnoDB buffer pool (most important setting) - use ~40% of available RAM for MySQL
+innodb_buffer_pool_size = 180M
+innodb_buffer_pool_instances = 1
+
+# Log buffer
+innodb_log_buffer_size = 8M
+innodb_log_file_size = 32M
+
+# Query cache (for MySQL 5.7, disabled in 8.0 by default)
+query_cache_size = 0
+query_cache_type = 0
+
+# Connection limits
+max_connections = 50
+max_user_connections = 45
+
+# Thread cache
+thread_cache_size = 8
+
+# Table cache
+table_open_cache = 400
+table_definition_cache = 200
+
+# Temporary tables
+tmp_table_size = 16M
+max_heap_table_size = 16M
+
+# MyISAM settings (if used)
+key_buffer_size = 16M
+
+# Binary logging (disable if not needed for replication)
+skip-log-bin
+
+# InnoDB settings
+innodb_flush_log_at_trx_commit = 2
+innodb_flush_method = O_DIRECT
+innodb_file_per_table = 1
+
+# Disable performance schema to save memory
+performance_schema = OFF
+
+# Slow query log (optional, for debugging)
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/mysql-slow.log
+long_query_time = 2
+
+[mysql]
+default-character-set = utf8mb4
+
+[client]
+default-character-set = utf8mb4

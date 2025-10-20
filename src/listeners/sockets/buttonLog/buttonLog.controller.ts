@@ -35,10 +35,10 @@ const buttonLogController = wrapAsyncSocket(
       }
     });
 
-    socket.on('clickLog:all', async () => {
-      try {
-        console.log('🔔 Controller received clickLog:all event')
-        const result = await buttonLogService.all()
+    socket.on('clickLog:all', async ({ page, pageSize }: { page?: number, pageSize?: number }) => {
+      try { 
+        console.log(`🔔 Controller received clickLog:all event page: ${page} pageSize: ${pageSize}`)
+        const result = await buttonLogService.all(page, pageSize)
         socket.emit('clickLog:allResponse', {
           success: true,
           message: `Retrieved all button logs`,

@@ -2,7 +2,7 @@ import ButtonLogModelSequelize, { ButtonLogClientType, ButtonLogModelType } from
 
 export interface IButtonLogUseCase {
   logButtonClick: (data: ButtonLogClientType) => Promise<ButtonLogModelType | null>;
-  all: () => Promise<ButtonLogModelType[] | null>;
+  all: (page?: number, pageSize?: number) => Promise<ButtonLogModelType[] | null>;
 }
 
 const logButtonClick = async (data: ButtonLogClientType): Promise<ButtonLogModelType | null> => {
@@ -11,8 +11,13 @@ const logButtonClick = async (data: ButtonLogClientType): Promise<ButtonLogModel
   return null;
 }
 
-const all = async (): Promise<ButtonLogModelType[] | null> => {
-  let logs = await ButtonLogModelSequelize.findAll();
+const all = async (page?: number, pageSize?: number): Promise<ButtonLogModelType[] | null> => {
+  let _page = page || 1;
+  let _pageSize = pageSize || 5;
+  let logs = await ButtonLogModelSequelize.findAll({
+    limit: _pageSize,
+    offset: (_page - 1) * _pageSize
+  });
   return logs.map(log => log.dataValues as ButtonLogModelType);
 }
 

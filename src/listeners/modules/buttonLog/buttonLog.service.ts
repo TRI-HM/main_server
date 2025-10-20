@@ -9,8 +9,8 @@ const logButtonClick = (service: IButtonLogService) =>
   }
 
 const all = (service: IButtonLogService) =>
-  async (): Promise<ButtonLogModelType[] | null> => {
-    return service.all();
+  async (page?: number, pageSize?: number): Promise<ButtonLogModelType[] | null> => {
+    return service.all(page, pageSize);
   }
 
 const buttonLogService: IButtonLogService = {

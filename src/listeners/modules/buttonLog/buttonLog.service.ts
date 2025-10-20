@@ -1,5 +1,6 @@
 import { ButtonLogClientType, ButtonLogModelType } from "../../../models/buttonLog/buttonLog.model";
 import buttonLogUseCase, { IButtonLogUseCase } from "../../useCase/buttonLog/buttonLog.useCase";
+import { IPaginationInfoType } from "../../../types/paginationInfo.io";
 
 export interface IButtonLogService extends IButtonLogUseCase { }
 
@@ -9,8 +10,8 @@ const logButtonClick = (service: IButtonLogService) =>
   }
 
 const all = (service: IButtonLogService) =>
-  async (page?: number, pageSize?: number): Promise<ButtonLogModelType[] | null> => {
-    return service.all(page, pageSize);
+  async (page?: number, pageSize?: number): Promise<{ data: ButtonLogModelType[], pagination: IPaginationInfoType } | null> => {
+    return service.all(page, pageSize || 5);
   }
 
 const buttonLogService: IButtonLogService = {

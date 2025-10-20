@@ -1,4 +1,5 @@
 import { RealEstateViewsClientType, RealEstateViewsModelType } from "../../../models/realEstate.views";
+import { IPaginationInfoType } from "../../../types/paginationInfo.io";
 import realEstateViewUseCase, { IRealEstateViewUseCase } from "../../useCase/realEstate/realEstate.view.useCases";
 
 export interface IRealEstateViewService extends IRealEstateViewUseCase { }
@@ -9,8 +10,8 @@ const create = (service: IRealEstateViewService) =>
   }
 
 const all = (service: IRealEstateViewService) =>
-  async (): Promise<RealEstateViewsModelType[] | null> => {
-    return service.all();
+  async (page?: number, pageSize?: number): Promise<{ data: RealEstateViewsModelType[], pagination: IPaginationInfoType } | null> => {
+    return service.all(page, pageSize || 5);
   }
 
 const realEstateViewService: IRealEstateViewService = {

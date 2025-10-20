@@ -36,13 +36,14 @@ const buttonLogController = wrapAsyncSocket(
     });
 
     socket.on('clickLog:all', async ({ page, pageSize }: { page?: number, pageSize?: number }) => {
-      try { 
+      try {
         console.log(`🔔 Controller received clickLog:all event page: ${page} pageSize: ${pageSize}`)
         const result = await buttonLogService.all(page, pageSize)
         socket.emit('clickLog:allResponse', {
           success: true,
-          message: `Retrieved all button logs`,
-          data: result,
+          message: `Retrieved all button logs with pagination`,
+          data: result?.data || [],
+          pagination: result?.pagination || null,
           timestamp: new Date().toISOString()
         });
       } catch (error) {

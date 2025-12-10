@@ -2,7 +2,7 @@ import { Response, Request, Router } from "express";
 import { IUserUseCase, UserClientType, UserModelType } from "../../models/userModel";
 import userService from "../../services/userService";
 import { wrapAsync } from "../../middleware/wrapAsync";
-import io from "../../util/io";
+import ioCustom from "../../util/ioCustom";
 import { StatusCodes } from "http-status-codes";
 
 const router = Router();
@@ -46,7 +46,7 @@ const update = wrapAsync(
       console.log("User update failed");
       res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json(io.toResponseError({ code: 500, message: "User update failed" }));
+        .json(ioCustom.toResponseError({ code: 500, message: "User update failed" }));
       return;
     }
     res.send(true);

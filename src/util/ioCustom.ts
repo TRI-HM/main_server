@@ -17,8 +17,16 @@ const toResponseError = (error: ErrorType, data?: any): toResponseType => {
   };
 }
 
-const io = {
+const toResponse = (statusCode: number, message: string, data?: any): toResponseType => {
+  return {
+    statusCode,
+    message,
+    data,
+  };
+}
+const ioCustom = {
   toResponseError,
+  toResponse,
 };
 
-export default io;
+export default ioCustom;

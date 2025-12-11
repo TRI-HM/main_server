@@ -12,6 +12,7 @@
     "mysql2": "^3.14.0",
     "sequelize": "^6.37.7",
     "socket.io": "^4.8.1",
+    "ts-node": "^10.9.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -24,12 +25,13 @@
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.2",
-    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "npx sequelize-cli db:migrate && nodemon --exec ts-node --files src/app.ts",
-    "test:realEstate": "ts-node scripts/runTests.ts",
-    "test:mock": "ts-node scripts/runTests.ts"
+    "start": "npx sequelize-cli db:migrate && node --max-old-space-size=300 -r ts-node/register src/app.ts",
+    "start:prod": "NODE_ENV=production npm run start",
+    "start:dev": "nodemon --exec \"node --max-old-space-size=300 -r ts-node/register src/app.ts\"",
+    "test:realEstate": "node --max-old-space-size=200 -r ts-node/register scripts/runTests.ts",
+    "test:mock": "node --max-old-space-size=200 -r ts-node/register scripts/runTests.ts"
   }
 }

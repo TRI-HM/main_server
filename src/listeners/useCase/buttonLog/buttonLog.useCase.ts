@@ -1,8 +1,11 @@
 import ButtonLogModelSequelize, { ButtonLogClientType, ButtonLogModelType } from "../../../models/buttonLog/buttonLog.model";
+import { IPaginationInfoType } from "../../../types/paginationInfo.io";
+import { paginate } from "../../../util/pagination.util";
+
 
 export interface IButtonLogUseCase {
   logButtonClick: (data: ButtonLogClientType) => Promise<ButtonLogModelType | null>;
-  all: () => Promise<ButtonLogModelType[] | null>;
+  all: (page?: number, pageSize?: number) => Promise<{ data: ButtonLogModelType[], pagination: IPaginationInfoType } | null>;
 }
 
 const logButtonClick = async (data: ButtonLogClientType): Promise<ButtonLogModelType | null> => {
@@ -11,9 +14,11 @@ const logButtonClick = async (data: ButtonLogClientType): Promise<ButtonLogModel
   return null;
 }
 
-const all = async (): Promise<ButtonLogModelType[] | null> => {
-  let logs = await ButtonLogModelSequelize.findAll();
-  return logs.map(log => log.dataValues as ButtonLogModelType);
+const all = async (page?: number, pageSize?: number): Promise<{ data: ButtonLogModelType[], pagination: IPaginationInfoType } | null> => {
+  return await paginate<ButtonLogModelType>(
+    ButtonLogModelSequelize,
+    { page: page || 1, pageSize: pageSize || 5, orderBy: 'createdAt', orderDirection: 'DESC' }
+  );
 }
 
 const buttonLogUseCase: IButtonLogUseCase = {

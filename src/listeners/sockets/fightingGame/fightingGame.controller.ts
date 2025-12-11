@@ -45,6 +45,34 @@ const fightingGameController = wrapAsyncSocket(
             });
         });
 
+        // server listening ready
+        socket.on(FightingGameEvent.READY, async () => {
+            const client = connectedClients.get(socket.id);
+            // game to server ready
+            if (client?.type === ROOMS.GAME) {
+                // server to display ready, game will wait for display ready
+                io
+                    .to(ROOMS.DISPLAY)
+                    .emit(FightingGameEvent.READY, ioCustom.toResponse(StatusCodes.OK, 'Client ready', client));
+            }
+            // display to server ready
+            if (client?.type === ROOMS.DISPLAY) {
+                // server to game ready, game bắt đầu 
+                io
+                    .to(ROOMS.GAME)
+                    .emit(FightingGameEvent.START, ioCustom.toResponse(StatusCodes.OK, 'Game started', client));
+            }
+        });
+
+        // server listening score
+        socket.on(FightingGameEvent.SCORE, async () => {
+            const client = connectedClients.get(socket.id);
+            if (client?.type === ROOMS.GAME) {
+                // server to display score, display will update score realtime
+                io.to(ROOMS.DISPLAY).emit(FightingGameEvent.SCORE, ioCustom.toResponse(StatusCodes.OK, 'Score updated', client));
+            }
+        });
+
         // Disconnect client
         socket.on("disconnect", () => {
             console.log(`❌ Client ${socket.id} disconnected`);

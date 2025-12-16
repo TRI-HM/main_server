@@ -10,17 +10,19 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
     try {
         // Kiểm tra xem file có tồn tại không
         if (!req.file) {
-            console.log("Content-Type:", req.headers['content-type']);
-            console.log("req.body keys:", Object.keys(req.body));
-            res.status(400).json({
-                success: false,
-                message: 'Không có file video nào được tải lên',
-                hint: 'Đảm bảo trong Postman: Body -> form-data -> Key: "video" (Type: File)'
-            });
+            // console.log("Content-Type:", req.headers['content-type']);
+            // console.log("req.body keys:", Object.keys(req.body));
+            res.status(StatusCodes.BAD_REQUEST)
+                .json(ioCustom.toResponseError({
+                    code: StatusCodes.BAD_REQUEST,
+                    message: 'Không có file video nào được tải lên. Đảm bảo trong Postman: Body -> form-data -> Key: "video" (Type: File)',
+                }));
             return;
         }
         // Lấy thông tin từ form
         const description = req.body.description || 'Không có mô tả';
+        const phone = req.body.phone || '';
+        
 
         // Tạo folder date theo format yyyymmdd (giống như trong multer)
         const currentDate = new Date();
@@ -28,7 +30,7 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
         const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
         const day = currentDate.getDate().toString().padStart(2, '0');
         const dateFolder = `${year}${month}${day}`;
-        
+
         // Tạo URL với folder date
         const videoUrl = `${process.env.BASE_URL}/videos/uploads/${dateFolder}/${req.file.filename}`;
 

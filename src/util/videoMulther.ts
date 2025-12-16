@@ -1,27 +1,8 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { generateFileNameWithTime, getDateFolderName } from "./generateNameWithTime";
 
-const generateUniqueFileNameByTime = (): string => {
-  console.log("generateUniqueFileNameByTime");
-  // format : mmssSSS-randomNumber (chỉ minute, second, millisecond)
-  const randomNumber = Math.floor(Math.random() * 1E9);
-  const currentDate = new Date();
-  const minute = currentDate.getMinutes().toString().padStart(2, '0');
-  const second = currentDate.getSeconds().toString().padStart(2, '0');
-  const millisecond = currentDate.getMilliseconds().toString().padStart(3, '0');
-
-  return `${minute}${second}${millisecond}-${randomNumber}`;
-}
-
-// Tạo tên folder theo format yyyymmdd
-const getDateFolderName = (): string => {
-  const currentDate = new Date();
-  const year = currentDate.getFullYear().toString();
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-  const day = currentDate.getDate().toString().padStart(2, '0');
-  return `${year}${month}${day}`;
-}
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -38,7 +19,7 @@ const storage = multer.diskStorage({
   },
   // Đặt tên file lưu trữ theo định dạng: mmssSSS-randomNumber-originalName
   filename: function (req, file, cb) {
-    const uniqueCode = generateUniqueFileNameByTime(); // Tạo mã số random dựa trên minute, second, millisecond
+    const uniqueCode = generateFileNameWithTime(); // Tạo mã số random dựa trên minute, second, millisecond
     cb(null, uniqueCode + '-' + file.originalname); // Kết hợp mã số với tên file gốc
   }
 });

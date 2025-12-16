@@ -8,7 +8,7 @@ import { VideoClientType } from "../../models/video.model";
 const postVideo = wrapAsync(async (req: Request, res: Response) => {
     try {
         const video: Partial<VideoClientType> = {
-           
+
         };
 
         res
@@ -21,11 +21,11 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
 
 
         // Tạo folder date theo format yyyymmdd (giống như trong multer)
-        const currentDate = new Date();
-        const year = currentDate.getFullYear().toString();
-        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-        const day = currentDate.getDate().toString().padStart(2, '0');
-        const dateFolder = `${year}${month}${day}`;
+        // const currentDate = new Date();
+        // const year = currentDate.getFullYear().toString();
+        // const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        // const day = currentDate.getDate().toString().padStart(2, '0');
+        // const dateFolder = `${year}${month}${day}`;
 
         // Tạo URL với folder date
         // const videoUrl = `${process.env.BASE_URL}/videos/uploads/${dateFolder}/${req.file.filename}`;
@@ -44,7 +44,7 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
 
         // console.log('File đã tải lên:', fileInfo);
 
-        
+
         // console.log('Video:', video);
         // let newVideo = await videoService.create(video);
 

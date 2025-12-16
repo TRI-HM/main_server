@@ -1,22 +1,20 @@
 import { Request, Response } from "express"
-import { wrapAsync } from "../../middleware/wrapAsync";
+import { wrapAsync } from "../../util/wrapAsync";
 import ioCustom from "../../util/ioCustom";
 import { StatusCodes } from "http-status-codes";
 import videoService from "../../services/video.service";
-import { VideoModelType } from "../../models/video.model";
+import { VideoClientType } from "../../models/video.model";
+
 const postVideo = wrapAsync(async (req: Request, res: Response) => {
     try {
-        // Kiểm tra xem file có tồn tại không
-        if (!req.file) {
-            // console.log("Content-Type:", req.headers['content-type']);
-            // console.log("req.body keys:", Object.keys(req.body));
-            res.status(StatusCodes.BAD_REQUEST)
-                .json(ioCustom.toResponseError({
-                    code: StatusCodes.BAD_REQUEST,
-                    message: 'Không có file video nào được tải lên. Đảm bảo trong Postman: Body -> form-data -> Key: "video" (Type: File)',
-                }));
-            return;
-        }
+        const video: Partial<VideoClientType> = {
+           
+        };
+
+        res
+            .status(StatusCodes.OK)
+            .json(ioCustom.toResponse(StatusCodes.OK, 'Tải lên video thành công', req.file || {}));
+
         // Lấy thông tin từ form
         const description = req.body.description || 'Không có mô tả';
         const phone = req.body.phone || '';
@@ -30,40 +28,32 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
         const dateFolder = `${year}${month}${day}`;
 
         // Tạo URL với folder date
-        const videoUrl = `${process.env.BASE_URL}/videos/uploads/${dateFolder}/${req.file.filename}`;
+        // const videoUrl = `${process.env.BASE_URL}/videos/uploads/${dateFolder}/${req.file.filename}`;
 
         // Thông tin về file đã tải lên
-        const fileInfo = {
-            filename: req.file.filename,
-            originalname: req.file.originalname,
-            mimetype: req.file.mimetype,
-            size: req.file.size,
-            path: req.file.path,
-            url: videoUrl, // Đường dẫn đến video đã tải lên
-            qrcode: `${process.env.BASE_URL_QRCODE}/video?id=${req.file.filename}`, // Đường dẫn đến video đã tải lên
-            description: description
-        };
+        // const fileInfo = {
+        //     filename: req.file.filename,
+        //     originalname: req.file.originalname,
+        //     mimetype: req.file.mimetype,
+        //     size: req.file.size,
+        //     path: req.file.path,
+        //     url: videoUrl, // Đường dẫn đến video đã tải lên
+        //     qrcode: `${process.env.BASE_URL_QRCODE}/video?id=${req.file.filename}`, // Đường dẫn đến video đã tải lên
+        //     description: description
+        // };
 
-        console.log('File đã tải lên:', fileInfo);
+        // console.log('File đã tải lên:', fileInfo);
 
-        const video: VideoModelType = {
-            fileName: req.file.filename,
-            filePath: videoUrl,
-            phone: req.body.phone,
-            isEnabled: 0,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            deletedAt: undefined,
-        };
-        console.log('Video:', video);
-        let newVideo = await videoService.postVideo(video);
+        
+        // console.log('Video:', video);
+        // let newVideo = await videoService.create(video);
 
-        // Trả về kết quả thành công
-        res.status(200).json({
-            success: true,
-            message: 'Tải lên video thành công',
-            data: fileInfo
-        });
+        // // Trả về kết quả thành công
+        // res.status(200).json({
+        //     success: true,
+        //     message: 'Tải lên video thành công',
+        //     data: fileInfo
+        // });
 
     } catch (error) {
         console.error('Lỗi khi tải lên video:', error);

@@ -58,6 +58,6 @@ export const uploadVideoMulterHandle = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 10 * 1080 * 1920, // Giới hạn kích thước file tối đa là 10MB
+    fileSize: 200 * 1024 * 1024, // Giới hạn kích thước file tối đa là 200MB
   }
 });

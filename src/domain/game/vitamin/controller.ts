@@ -1,7 +1,7 @@
 import { Response, Request, Router } from "express";
 import { GameVitaminClientType, GameVitaminModelType } from "../../../models/game/vitamin";
 import vitaminService from "../../../services/game/vitamin/vitaminService";
-import { wrapAsync } from "../../../middleware/wrapAsync";
+import { wrapAsync } from "../../../util/wrapAsync";
 // import io from "../../../util/io";
 // import { StatusCodes } from "http-status-codes";
 

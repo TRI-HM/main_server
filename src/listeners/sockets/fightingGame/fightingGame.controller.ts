@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { StatusCodes } from "http-status-codes";
 import ioCustom from "../../../util/ioCustom";
-import { wrapAsyncSocket } from "../../../middleware/wrapAsyncSocket";
+import { wrapAsyncSocket } from "../../../util/wrapAsyncSocket";
 import FightingGameEvent from "./event.controller";
 import { ClientInfo, RegisterData, ROOMS } from "./types";
 

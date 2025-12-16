@@ -1,7 +1,7 @@
 import { Response, Request, Router } from "express";
 import { IUserUseCase, UserClientType, UserModelType } from "../../models/userModel";
 import userService from "../../services/userService";
-import { wrapAsync } from "../../middleware/wrapAsync";
+import { wrapAsync } from "../../util/wrapAsync";
 import ioCustom from "../../util/ioCustom";
 import { StatusCodes } from "http-status-codes";
 

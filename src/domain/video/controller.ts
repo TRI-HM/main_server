@@ -1,11 +1,9 @@
-
 import { Request, Response } from "express"
 import { wrapAsync } from "../../middleware/wrapAsync";
 import ioCustom from "../../util/ioCustom";
 import { StatusCodes } from "http-status-codes";
-import path from "path";
-import videoService from "../../services/videoService";
-import { VideoModelType } from "../../models/videoModel";
+import videoService from "../../services/video.service";
+import { VideoModelType } from "../../models/video.model";
 const postVideo = wrapAsync(async (req: Request, res: Response) => {
     try {
         // Kiểm tra xem file có tồn tại không
@@ -22,7 +20,7 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
         // Lấy thông tin từ form
         const description = req.body.description || 'Không có mô tả';
         const phone = req.body.phone || '';
-        
+
 
         // Tạo folder date theo format yyyymmdd (giống như trong multer)
         const currentDate = new Date();
@@ -49,13 +47,13 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
         console.log('File đã tải lên:', fileInfo);
 
         const video: VideoModelType = {
-            file_name: req.file.filename,
-            file_path: videoUrl,
+            fileName: req.file.filename,
+            filePath: videoUrl,
             phone: req.body.phone,
-            is_enabled: 0,
-            created_at: new Date(),
-            updated_at: new Date(),
-            deleted_at: undefined,
+            isEnabled: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            deletedAt: undefined,
         };
         console.log('Video:', video);
         let newVideo = await videoService.postVideo(video);

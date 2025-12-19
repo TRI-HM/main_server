@@ -36,8 +36,8 @@ const textToMusic = async (data: ITextToMusicRequest) => {
 
         console.log(`Generating music for: "${data.prompt}"...`);
 
-        // Sử dụng music.compose() để tạo nhạc trực tiếp từ prompt
-        // Đây là cách đơn giản và đúng nhất theo documentation của ElevenLabs
+        // Sử dụng music.composeDetailed() để tạo nhạc với metadata chi tiết
+        // Method này trả về audio data cùng với metadata và composition plan
         const musicLengthMs = data.duration ? data.duration * 1000 : 10000;
 
         // Đảm bảo độ dài trong khoảng hợp lệ (tối thiểu 3000ms = 3 giây)
@@ -45,31 +45,65 @@ const textToMusic = async (data: ITextToMusicRequest) => {
 
         console.log(`Generating music with length: ${validLengthMs}ms (${validLengthMs / 1000}s)...`);
 
-        // Gọi API compose để generate audio trực tiếp
-        const response = await elevenlabs.music.compose({
+        // Gọi API composeDetailed để generate audio với metadata chi tiết
+        const response = await elevenlabs.music.composeDetailed({
             prompt: data.prompt,
             musicLengthMs: validLengthMs,
         });
 
         console.log('Music generation completed, processing response...');
 
-        // music.compose() trả về ReadableStream (Web Stream)
-        // Cần convert sang Node.js Readable stream để ghi file
+        // composeDetailed() trả về object với structure:
+        // - response.audio: audio data (có thể là Buffer, Uint8Array, hoặc stream)
+        // - response.json: metadata và composition plan
+        // - response.filename: tên file được đề xuất
+
+        // Cast response để TypeScript hiểu structure
+        const detailedResponse = response as any;
+
+        // Log metadata nếu có
+        if (detailedResponse.json) {
+            console.log('Song metadata:', {
+                title: detailedResponse.json.songMetadata?.title,
+                genres: detailedResponse.json.songMetadata?.genres,
+                sections: detailedResponse.json.compositionPlan?.sections?.length || 0
+            });
+        }
+
+        // Xử lý audio data từ response
         let nodeStream: Readable;
 
-        if (response instanceof ReadableStream) {
-            // Convert Web ReadableStream sang Node.js Readable stream
-            nodeStream = Readable.fromWeb(response as any);
+        // Kiểm tra response.audio (audio data) hoặc response chính nó nếu không có property audio
+        const audioData = detailedResponse.audio || response;
+
+        if (audioData instanceof ReadableStream) {
+            // Nếu là Web ReadableStream, convert sang Node.js stream
+            nodeStream = Readable.fromWeb(audioData as any);
             console.log('Converted Web ReadableStream to Node.js stream');
-        } else if (response && typeof response === 'object' && 'pipe' in response && typeof (response as any).pipe === 'function') {
+        } else if (audioData && typeof audioData === 'object' && 'pipe' in audioData && typeof (audioData as any).pipe === 'function') {
             // Nếu đã là Node.js stream
-            nodeStream = response as Readable;
+            nodeStream = audioData as Readable;
             console.log('Response is already Node.js stream');
+        } else if (Buffer.isBuffer(audioData)) {
+            // Nếu là Buffer
+            nodeStream = Readable.from(audioData);
+            console.log('Audio data is Buffer');
+        } else if (audioData instanceof Uint8Array) {
+            // Nếu là Uint8Array
+            const buffer = Buffer.from(audioData);
+            nodeStream = Readable.from(buffer);
+            console.log('Audio data is Uint8Array');
+        } else if (audioData instanceof ArrayBuffer) {
+            // Nếu là ArrayBuffer
+            const buffer = Buffer.from(new Uint8Array(audioData));
+            nodeStream = Readable.from(buffer);
+            console.log('Audio data is ArrayBuffer');
         } else {
             // Log để debug nếu response không đúng format
             console.error('Unexpected response type:', typeof response);
-            console.error('Response:', response);
-            throw new Error(`Response không phải là ReadableStream. Type: ${typeof response}`);
+            console.error('Response keys:', response && typeof response === 'object' ? Object.keys(response) : 'N/A');
+            console.error('Audio data type:', typeof audioData);
+            throw new Error(`Không thể xử lý audio data. Response type: ${typeof response}, Audio type: ${typeof audioData}`);
         }
 
         const fileStream = fs.createWriteStream(filePath);

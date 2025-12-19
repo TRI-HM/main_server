@@ -21,9 +21,7 @@ const textToMusic = async (data: ITextToMusicRequest) => {
             throw new Error('Prompt is required');
         }
 
-        const client = new ElevenLabsClient({
-            apiKey: process.env.ELEVENLABS_API_KEY,
-        });
+        const elevenlabs = new ElevenLabsClient();
 
         // Setup đường dẫn
         const rootDir = process.cwd();
@@ -39,10 +37,9 @@ const textToMusic = async (data: ITextToMusicRequest) => {
         console.log(`Generating music for: "${data.prompt}"...`);
 
         // Gọi API - Trả về Web Stream
-        const audioStream = await client.textToSoundEffects.convert({
-            text: data.prompt,
-            durationSeconds: data.duration || 10,
-            promptInfluence: 0.5,
+        const audioStream = await await elevenlabs.music.compositionPlan.create({
+            prompt: data.prompt,
+            musicLengthMs: 10000,
         });
 
         // Convert sang Node Stream

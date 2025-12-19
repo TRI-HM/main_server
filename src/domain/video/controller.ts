@@ -19,34 +19,35 @@ const postVideo = wrapAsync(async (req: Request, res: Response) => {
         const description = req.body.description || 'Không có mô tả';
         const phone = req.body.phone || '';
 
-
-        // Tạo folder date theo format yyyymmdd (giống như trong multer)
-        // const currentDate = new Date();
-        // const year = currentDate.getFullYear().toString();
-        // const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-        // const day = currentDate.getDate().toString().padStart(2, '0');
-        // const dateFolder = `${year}${month}${day}`;
-
-        // Tạo URL với folder date
-        // const videoUrl = `${process.env.BASE_URL}/videos/uploads/${dateFolder}/${req.file.filename}`;
+        console.log('description', description);
+        console.log('phone', phone);
+        console.log('file', req.file?.originalname);
+        console.log('file', req.file?.filename);
+        console.log('file', req.file?.mimetype);
+        console.log('file', req.file?.size);
+        console.log('file', req.file?.path);
+        console.log('req.body', req.body);
 
         // Thông tin về file đã tải lên
         // const fileInfo = {
-        //     filename: req.file.filename,
-        //     originalname: req.file.originalname,
-        //     mimetype: req.file.mimetype,
-        //     size: req.file.size,
-        //     path: req.file.path,
-        //     url: videoUrl, // Đường dẫn đến video đã tải lên
-        //     qrcode: `${process.env.BASE_URL_QRCODE}/video?id=${req.file.filename}`, // Đường dẫn đến video đã tải lên
+        //     filename: req.file?.filename || '',
+        //     originalname: req.file?.originalname || '',
+        //     mimetype: req.file?.mimetype || '',
+        //     size: req.file?.size || 0,
+        //     path: req.file?.path || '',
+        //     url: `${process.env.BASE_URL}/videos/uploads/${req.file?.filename}`, // Đường dẫn đến video đã tải lên
+        //     qrcode: `${process.env.BASE_URL_QRCODE}/video?id=${req.file?.filename}`, // Đường dẫn đến video đã tải lên
         //     description: description
         // };
-
-        // console.log('File đã tải lên:', fileInfo);
-
-
-        // console.log('Video:', video);
-        // let newVideo = await videoService.create(video);
+        // await videoService.create({
+        //     name: req.file?.originalname || '',
+        //     phone: phone,
+        //     description: description,
+        //     filePath: req.file?.path || '',
+        //     isEnabled: true,
+        //     status: 'pending',
+        //     note: '',
+        // });
 
         // // Trả về kết quả thành công
         // res.status(200).json({

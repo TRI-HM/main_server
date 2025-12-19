@@ -12,4 +12,8 @@ router.post(
     videoController.postVideo
 );
 
+// router.get(
+//     "/getAll",
+//     videoController.getAll
+// );
 export default router;

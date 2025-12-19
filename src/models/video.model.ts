@@ -2,10 +2,6 @@ import { DataTypes } from "sequelize";
 import SequelizeDB from "../database/db";
 
 export const VideoModelSequelize = SequelizeDB.define("video", {
-  id: {
-    type: DataTypes.STRING,
-    primaryKey: true,
-  },
   name: {
     type: DataTypes.STRING,
     defaultValue: `Theon-${Date.now()}`,
@@ -45,7 +41,6 @@ export const VideoModelSequelize = SequelizeDB.define("video", {
 })
 
 export type VideoModelType = {
-  id: string;
   name: string;
   phone: string;
   description: string;

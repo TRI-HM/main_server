@@ -6,6 +6,8 @@ import { Readable } from "stream";
 import { ITextToMusicRequest } from "../../../domain/ai/elevenlabs/textToMusic/controller";
 import ioCustom from "../../../util/ioCustom";
 import { StatusCodes } from "http-status-codes";
+import dotenv from "dotenv";
+dotenv.config();
 
 const ensureDirectoryExists = (dirPath: string) => {
     if (!fs.existsSync(dirPath)) {
@@ -20,8 +22,7 @@ const textToMusic = async (data: ITextToMusicRequest) => {
         }
 
         const client = new ElevenLabsClient({
-            // apiKey: process.env.ELEVENLABS_API_KEY,
-            apiKey: 'sk_b54c2d08b105e229dcde46a4bc7b6129c23eed58bbe0abd9',
+            apiKey: process.env.ELEVENLABS_API_KEY,
         });
 
         // Setup đường dẫn

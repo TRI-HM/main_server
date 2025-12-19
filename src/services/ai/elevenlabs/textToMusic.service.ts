@@ -20,7 +20,8 @@ const textToMusic = async (data: ITextToMusicRequest) => {
         }
 
         const client = new ElevenLabsClient({
-            apiKey: process.env.ELEVENLABS_API_KEY,
+            // apiKey: process.env.ELEVENLABS_API_KEY,
+            apiKey: 'sk_b54c2d08b105e229dcde46a4bc7b6129c23eed58bbe0abd9',
         });
 
         // Setup đường dẫn

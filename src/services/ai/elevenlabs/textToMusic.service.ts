@@ -36,19 +36,45 @@ const textToMusic = async (data: ITextToMusicRequest) => {
 
         console.log(`Generating music for: "${data.prompt}"...`);
 
-        // Gọi API - Trả về Web Stream
-        const audioStream = await await elevenlabs.music.compositionPlan.create({
+        // Sử dụng music.compose() để tạo nhạc trực tiếp từ prompt
+        // Đây là cách đơn giản và đúng nhất theo documentation của ElevenLabs
+        const musicLengthMs = data.duration ? data.duration * 1000 : 10000;
+
+        // Đảm bảo độ dài trong khoảng hợp lệ (tối thiểu 3000ms = 3 giây)
+        const validLengthMs = Math.max(3000, Math.min(300000, musicLengthMs));
+
+        console.log(`Generating music with length: ${validLengthMs}ms (${validLengthMs / 1000}s)...`);
+
+        // Gọi API compose để generate audio trực tiếp
+        const response = await elevenlabs.music.compose({
             prompt: data.prompt,
-            musicLengthMs: 10000,
+            musicLengthMs: validLengthMs,
         });
 
-        // Convert sang Node Stream
-        // Lưu ý: SDK trả về dòng dữ liệu chuẩn Web, cần ép sang chuẩn Node
-        const nodeStream = Readable.fromWeb(audioStream as any);
+        console.log('Music generation completed, processing response...');
+
+        // music.compose() trả về ReadableStream (Web Stream)
+        // Cần convert sang Node.js Readable stream để ghi file
+        let nodeStream: Readable;
+
+        if (response instanceof ReadableStream) {
+            // Convert Web ReadableStream sang Node.js Readable stream
+            nodeStream = Readable.fromWeb(response as any);
+            console.log('Converted Web ReadableStream to Node.js stream');
+        } else if (response && typeof response === 'object' && 'pipe' in response && typeof (response as any).pipe === 'function') {
+            // Nếu đã là Node.js stream
+            nodeStream = response as Readable;
+            console.log('Response is already Node.js stream');
+        } else {
+            // Log để debug nếu response không đúng format
+            console.error('Unexpected response type:', typeof response);
+            console.error('Response:', response);
+            throw new Error(`Response không phải là ReadableStream. Type: ${typeof response}`);
+        }
 
         const fileStream = fs.createWriteStream(filePath);
 
-        // Pipeline giờ sẽ hoạt động trơn tru
+        // Pipeline để ghi file
         await pipeline(nodeStream, fileStream);
 
         console.log(`✅ File saved successfully at: ${filePath}`);

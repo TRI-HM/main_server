@@ -6,6 +6,8 @@ import FightingGameEvent from "./event.controller";
 import { ClientInfo, RegisterData, ROOMS } from "./types";
 
 const connectedClients = new Map<string, ClientInfo>();
+const score = new Map<string, number>();
+const scoreWinner = 10;
 
 const fightingGameController = wrapAsyncSocket(
     async (socket: Socket, io: Server) => {
@@ -43,6 +45,52 @@ const fightingGameController = wrapAsyncSocket(
             connectedClients.forEach((client: ClientInfo) => {
                 console.log(`✅ Client ${client.socketId} joined room ${room} ${client.type} ${client.nickname}`);
             });
+        });
+
+        // server listening ready
+        socket.on(FightingGameEvent.READY, async () => {
+            const client = connectedClients.get(socket.id);
+            // game to server ready
+            if (client?.type === ROOMS.GAME) {
+                // server to display ready, game will wait for display ready
+                io
+                    .to(ROOMS.DISPLAY)
+                    .emit(FightingGameEvent.READY, ioCustom.toResponse(StatusCodes.OK, 'Client ready', client));
+            }
+            // display to server ready
+            if (client?.type === ROOMS.DISPLAY) {
+                // server to game ready, game bắt đầu 
+                io
+                    .to(ROOMS.GAME)
+                    .emit(FightingGameEvent.START, ioCustom.toResponse(StatusCodes.OK, 'Game started', client));
+            }
+        });
+
+        // server listening score
+        socket.on(FightingGameEvent.SCORE, async () => {
+            const client = connectedClients.get(socket.id);
+            if (client?.type === ROOMS.GAME) {
+                // update score
+                score.set(client.socketId, (score.get(client.socketId) || 0) + 1);
+                // server to display score, display will update score realtime
+                io.to(ROOMS.DISPLAY).emit(FightingGameEvent.SCORE, ioCustom.toResponse(StatusCodes.OK, 'Score updated', score.get(client.socketId)));
+
+                if ((score.get(client?.socketId) || 0) >= scoreWinner) {
+                    // game end
+                    io.to(ROOMS.DISPLAY).emit(FightingGameEvent.END, ioCustom.toResponse(StatusCodes.OK, 'Game ended', client));
+                    io.to(ROOMS.GAME).emit(FightingGameEvent.END, ioCustom.toResponse(StatusCodes.OK, 'Game ended', client));
+                    return;
+                }
+            }
+        });
+       
+        // server listening restart
+        socket.on(FightingGameEvent.RESTART, async () => {
+            const client = connectedClients.get(socket.id);
+            if (client?.type === ROOMS.GAME) {
+                // server to display restart, display will update restart realtime
+                io.to(ROOMS.DISPLAY).emit(FightingGameEvent.RESTART, ioCustom.toResponse(StatusCodes.OK, 'Restart', client));
+            }
         });
 
         // Disconnect client

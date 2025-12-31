@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
 import realEstateApartmentService from "../../modules/realEstate/realEstate.apartment.service";
-import { wrapAsyncSocket } from "../../../middleware/wrapAsyncSocket";
+import { wrapAsyncSocket } from "../../../util/wrapAsyncSocket";
 import { RealEstateApartmentClientType } from "../../../models/realEstate.apartment";
-import { validateApartmentData } from "../../../middleware/realEstate.validationSchema";
+import { validateApartmentData } from "../../../util/realEstate.validationSchema";
 import realEstateViewService from "../../modules/realEstate/realEstate.view.service";
 
 const realEstate = wrapAsyncSocket(

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { wrapAsync } from "../../middleware/wrapAsync";
+import { wrapAsync } from "../../util/wrapAsync";
 import axios from "axios";
 
 const getOne = wrapAsync(

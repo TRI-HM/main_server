@@ -13,7 +13,7 @@ const SequelizeDB = new Sequelize(
     logging: false,
     define: {
       timestamps: true,
-      underscored: false,
+      underscored: true,
       paranoid: true,
     },
     timezone: "+07:00",

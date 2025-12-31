@@ -1,4 +1,4 @@
-import { wrapAsync } from "../../middleware/wrapAsync";
+import { wrapAsync } from "../../util/wrapAsync";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 

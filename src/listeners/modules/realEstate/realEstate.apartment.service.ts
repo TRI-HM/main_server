@@ -1,5 +1,5 @@
 import { RealEstateApartmentClientType, RealEstateApartmentModelType } from "../../../models/realEstate.apartment";
-import realEstateApartmentUseCase, { IRealEstateApartmentUseCase } from "../../useCase/realEstate/realEstate.useCases";
+import realEstateApartmentUseCase, { IRealEstateApartmentUseCase } from "../../../useCases/realEstate/realEstate.useCases";
 
 export interface IRealEstateService extends IRealEstateApartmentUseCase { }
 

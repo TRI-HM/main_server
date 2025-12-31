@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use('/api', routes);
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
-
+app.use('/videos', express.static(path.join(__dirname, '../public/videos')));
 
 const httpServer = createServer(app);
 

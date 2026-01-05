@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { wrapAsync } from "../../middleware/wrapAsync";
 import axios from "axios";
+import mediaService from "../../services/mediaService";
 
 const getOne = wrapAsync(
   async (req: Request, res: Response) => {
@@ -52,13 +53,11 @@ const upload = wrapAsync(
 
       // Lấy thông tin từ form
       const description = req.body.description || 'Không có mô tả';
-      const phone = req.body.phone || 'Không có số điện thoại';
       // Thông tin về file đã tải lên
       const fileInfo = {
         filename: req.file.filename,
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
-        phone: phone,
         size: req.file.size,
         url: `${process.env.BASE_URL}/images/uploads/${req.file.filename}`, // Đường dẫn đến ảnh đã tải lên
         qrcode: `${process.env.BASE_URL_QRCODE}/user?id=${req.file.filename}`, // Đường dẫn đến ảnh đã tải lên

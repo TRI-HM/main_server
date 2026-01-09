@@ -8,7 +8,6 @@ import { errorHandler } from './middleware/error';
 import routes from './domain/routes';
 import SequelizeDB from './database/db';
 import path from 'path';
-
 const app = express();
 app.use(cors());
 app.use(logger);

@@ -12,6 +12,7 @@ PepsiGameRouter.get("/getPlayerSelf", CheckInPlayGameController.getPlayerSelf);
 PepsiGameRouter.post("/adminSignin", CheckInPlayGameController.AdminSignin);
 PepsiGameRouter.post("/createAdmin", CheckInPlayGameController.createAdmin);
 PepsiGameRouter.get("/getAllPlayers", CheckInPlayGameController.getAllPlayers);
+PepsiGameRouter.put("/updatePlayer", CheckInPlayGameController.updatePlayer);
 PepsiGameRouter.get("/getGifts", GiftController.getGifts);
 PepsiGameRouter.put("/updateGift", GiftController.updateGift);
 

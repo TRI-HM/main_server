@@ -169,6 +169,7 @@ export interface IPlayerUseCase {
   searchByPhoneAndUsername: (input: string) => Promise<PlayerModelType[] | null>;
   isPlayerExists: (phone: string) => Promise<boolean>;
   getOneByPhoneAndUsername: (phone: string, username: string) => Promise<PlayerModelType | null>;
+  checkUniqueFieldExists: (field: string, value: any, excludeId?: number) => Promise<PlayerModelType | null>;
 }
 
 
@@ -270,6 +271,27 @@ const getOneByPhoneAndUsername = async (phone: string, username: string): Promis
     return null;
   }
 };
+
+const checkUniqueFieldExists = async (field: string, value: any, excludeId?: number): Promise<PlayerModelType | null> => {
+  try {
+    const whereClause: any = {};
+    if (excludeId !== undefined) {
+      whereClause[Op.and] = [
+        { [field]: value },
+        { id: { [Op.ne]: excludeId } }
+      ];
+    } else {
+      whereClause[field] = value;
+    }
+    const player = await PlayerModelSequelize.findOne({ where: whereClause });
+    if (!player) return null;
+    return player.dataValues as PlayerModelType;
+  }catch(error) {
+    console.error(`Error checking unique field ${field}:`, error);
+    return null;
+  }
+};
+
 export const playerUseCase: IPlayerUseCase = {
   create: createPlayer,
   update: updatePlayer,
@@ -278,5 +300,6 @@ export const playerUseCase: IPlayerUseCase = {
   delete: deletePlayer,
   searchByPhoneAndUsername: searchByPhoneAndUsername,
   isPlayerExists: isPlayerExists,
-  getOneByPhoneAndUsername: getOneByPhoneAndUsername
+  getOneByPhoneAndUsername: getOneByPhoneAndUsername,
+  checkUniqueFieldExists: checkUniqueFieldExists,
 }

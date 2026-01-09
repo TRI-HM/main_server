@@ -53,6 +53,11 @@ const getOneByPhoneAndUsername = async (phone: string, username: string): Promis
     return player;
 }
 
+const checkUniqueFieldExists = async (field: string, value: any, excludeId?: number): Promise<PlayerModelType | null> => {
+    let player = await playerUseCase.checkUniqueFieldExists(field, value, excludeId);
+    return player;
+}
+
 export default {
     createPlayer,
     updatePlayer,
@@ -62,4 +67,5 @@ export default {
     searchByPhoneAndUsername,
     isPlayerExists,
     getOneByPhoneAndUsername,
+    checkUniqueFieldExists,
 };

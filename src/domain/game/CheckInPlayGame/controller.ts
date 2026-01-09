@@ -123,6 +123,7 @@ const checkInPlayGame = wrapAsync(async (req: Request, res: Response) => {
 const updatePlayer = wrapAsync(async (req: Request, res: Response) => {
     try {
         let body = req.body;
+        let data = body.data;
         const authHeader = req.headers.authorization;
         let token = authHeader?.split(" ")[1];
         if (!token) {
@@ -144,8 +145,37 @@ const updatePlayer = wrapAsync(async (req: Request, res: Response) => {
             res.status(400).json({ message: "Player not found" });
             return;
         }
-        let playerData: Record<string, any> = {}
-        
+
+        // Kiểm tra các trường unique (phone, username, email) nếu có trong data
+        const uniqueFields = ['phone', 'username', 'email'];
+        for (const field of uniqueFields) {
+            if (data[field] !== undefined && data[field] !== null && data[field] !== '') {
+                // Kiểm tra xem giá trị này đã được sử dụng bởi player khác chưa
+                const existingPlayer = await playerService.checkUniqueFieldExists(field, data[field], playerId);
+                if (existingPlayer) {
+                    // Trường này đã được sử dụng bởi player khác
+                    const fieldName = field === 'phone' ? 'Số điện thoại' : field === 'username' ? 'Tên người dùng' : 'Email';
+                    res.status(400).json({ 
+                        message: `${fieldName} đã được sử dụng`, 
+                        field: field,
+                        error: `${fieldName} đã được sử dụng bởi tài khoản khác`
+                    });
+                    return;
+                }
+            }
+        }
+
+        // Nếu không có trùng lặp, tiến hành update
+        let playerUpdated: PlayerModelType | null = await playerService.updatePlayer(playerId, data);
+        if (!playerUpdated) {
+            res.status(500).json({ message: "Failed to update player" });
+            return;
+        }
+        res.status(200).json({ message: "Player updated successfully", data: playerUpdated });
+    }
+    catch(error){
+        res.status(500).json({ message: "Failed to update player", error: error });
+    }
 });
 
 const getPlayerSelf = wrapAsync(async (req: Request, res: Response) => {
@@ -301,5 +331,6 @@ const CheckInPlayGameController = {
     AdminSignin,
     createAdmin,
     getAllPlayers,
+    updatePlayer
 }
 export default CheckInPlayGameController;

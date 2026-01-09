@@ -7,5 +7,3 @@ router.post("/webhook", zaloController.RecieveWebhook);
 
 router.get("/verifier", zaloController.verify);
 export default router;
-
-

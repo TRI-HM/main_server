@@ -198,51 +198,6 @@ export const zaloController = {
 };
 
 
-// "params": [
-//         {
-//             "type": "1",
-//             "name": "name",
-//             "sample_value": "nguyen van A"
-//         },
-//         {
-//             "type": "11",
-//             "name": "order_code",
-//             "sample_value": "ABC123"
-//         },
-//         {
-//             "type": "15",
-//             "name": "phone_number",
-//             "sample_value": "0123456789"
-//         },
-//         {
-//             "type": "18",
-//             "name": "price",
-//             "sample_value": "100000"
-//         },
-//         {
-//             "type": "14",
-//             "name": "status",
-//             "sample_value": "DONE"
-//         },
-//         {
-//             "type": "19",
-//             "name": "date",
-//             "sample_value": "19/01/1999"
-//         }
-//     ]
-
-
-//     {
-//         "ky": "1",
-//         "thang": "4/2020",
-//         "start_date": "20/03/2020",
-//         "end_date": "20/04/2020",
-//         "customer": "Nguyễn Thị Hoàng Anh",
-//         "cid": "PE010299485",
-//         "address": "VNG Campus, TP.HCM",
-//         "amount": "100",
-//         "total": "100000",
-//      }
 // {
 //     "header": {
 //         "components": [

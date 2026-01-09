@@ -1,13 +1,15 @@
 import { createServer } from 'http';
 import express from 'express';
-import { Server } from 'socket.io';
 import cors from 'cors';
+import { LocalStorage } from 'node-localstorage';
 import SocketsManager from './listeners/socketsManager';
 import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error';
 import routes from './domain/routes';
 import SequelizeDB from './database/db';
 import path from 'path';
+import zaloRouter from './domain/zalo/route';
+import wishRouter from './domain/game/mirinda/route';
 const app = express();
 app.use(cors());
 app.use(logger);
@@ -18,19 +20,11 @@ app.use(express.static('public'));
 app.use('/api', routes);
 app.use('/images', express.static(path.join(__dirname, '../public/images')));
 app.use('/videos', express.static(path.join(__dirname, '../public/videos')));
+app.use('/zalo', zaloRouter);
+app.use('/mirinda', wishRouter);
 
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Accept']
-  },
-});
-io.on('connection', (socket) => {
-  SocketsManager(socket, io);
-});
 
 
 const PORT = process.env.PORT || 3000;

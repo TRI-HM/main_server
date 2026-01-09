@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { wrapAsync } from "../../util/wrapAsync";
 import axios from "axios";
+import mediaService from "../../services/mediaService";
 
 const getOne = wrapAsync(
   async (req: Request, res: Response) => {
@@ -52,7 +53,6 @@ const upload = wrapAsync(
 
       // Lấy thông tin từ form
       const description = req.body.description || 'Không có mô tả';
-
       // Thông tin về file đã tải lên
       const fileInfo = {
         filename: req.file.filename,

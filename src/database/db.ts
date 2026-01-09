@@ -11,6 +11,7 @@ const SequelizeDB = new Sequelize(
     dialect: "mysql",
     port: DBConfig.PORT,
     logging: false,
+    // Sử dụng camelCase cho tên cột (không dùng created_at, updated_at)
     define: {
       timestamps: true,
       underscored: false,

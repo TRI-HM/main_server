@@ -1,6 +1,6 @@
-import { RealEstateViewsClientType, RealEstateViewsModelSequelize, RealEstateViewsModelType } from "../../../models/realEstate.views";
-import { IPaginationInfoType } from "../../../types/paginationInfo.io";
-import { paginate } from "../../../util/pagination.util";
+import { RealEstateViewsClientType, RealEstateViewsModelSequelize, RealEstateViewsModelType } from "../../models/realEstate.views";
+import { IPaginationInfoType } from "../../types/paginationInfo.io";
+import { paginate } from "../../util/pagination.util";
 
 export interface IRealEstateViewUseCase {
   all: (page?: number, pageSize?: number) => Promise<{ data: RealEstateViewsModelType[], pagination: IPaginationInfoType } | null>;

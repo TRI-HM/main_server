@@ -1,5 +1,5 @@
 import { Socket, Server } from "socket.io"
-import { wrapAsyncSocket } from "../../../middleware/wrapAsyncSocket"
+import { wrapAsyncSocket } from "../../../util/wrapAsyncSocket"
 import buttonLogService from "../../modules/buttonLog/buttonLog.service";
 import { ButtonLogClientType } from "../../../models/buttonLog/buttonLog.model";
 

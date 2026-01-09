@@ -1,6 +1,6 @@
-import ButtonLogModelSequelize, { ButtonLogClientType, ButtonLogModelType } from "../../../models/buttonLog/buttonLog.model";
-import { IPaginationInfoType } from "../../../types/paginationInfo.io";
-import { paginate } from "../../../util/pagination.util";
+import ButtonLogModelSequelize, { ButtonLogClientType, ButtonLogModelType } from "../../models/buttonLog/buttonLog.model";
+import { IPaginationInfoType } from "../../types/paginationInfo.io";
+import { paginate } from "../../util/pagination.util";
 
 
 export interface IButtonLogUseCase {

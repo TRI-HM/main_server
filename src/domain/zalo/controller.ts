@@ -196,3 +196,70 @@ export const zaloController = {
     RecieveWebhook,
     verify,
 };
+
+
+// {
+//     "header": {
+//         "components": [
+//             {
+//                 "IMAGES": {
+//                     "items": [
+//                         {
+//                             "type": "IMAGE",
+//                             "media_id": "celebration-banner.png"
+//                         },
+//                     ]
+//                 }
+//             },
+//         ]
+//     },
+//     "body": {
+//         "components": [
+//             {
+//                 "TITLE": {
+//                     "value": "Quý khách nhận được lời chúc từ người thân"
+//                 }
+//             },
+//             {
+//                 "PARAGRAPH": {
+//                     "value": "Người thân tên <from_name> gửi đến bạn lời chúc sau:"
+//                 }
+//             },
+//             {
+//                 "TABLE": {
+//                     "rows": [
+//                         {
+//                             "value": "<from_name>",
+//                             "title": "Người gửi",
+//                             "row_type": 1
+//                         },
+//                         {
+//                             "value": "<order>",
+//                             "title": "Thứ tự"
+//                         },
+//                     ]
+//                 },
+//                 {
+//                     "PARAGRAPH": {
+//                         "value": "Lời chúc: <message>"
+//                     }
+//                 },
+//             },
+//         ]
+//     },
+//     "footer": {
+//         "components": [
+//             {
+//                 "BUTTONS": {
+//                     "items": [
+//                         {
+//                             "content": "https://zalo.me/1868947362941315995",
+//                             "type": 1,
+//                             "title": "Đến Creativ"
+//                         }
+//                     ]
+//                 }
+//             }
+//         ]
+//     }
+// }

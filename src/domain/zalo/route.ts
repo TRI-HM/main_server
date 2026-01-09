@@ -5,5 +5,5 @@ const router = Router();
 
 router.post("/webhook", zaloController.RecieveWebhook);
 
-router.get("/verify", zaloController.verify);
+router.get("/verifier", zaloController.verify);
 export default router;

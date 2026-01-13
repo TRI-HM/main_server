@@ -15,7 +15,6 @@ import { PlayerBoothProgressModelClientType } from "../../../models/game/checkIn
 export const createPlayer = wrapAsync(async (req: Request, res: Response) => {
     try {
         const player: CheckInPlayerModelClientType = req.body;
-        console.log("Player: ", player);
         let newPlayer = await playerService.createPlayer(player);
         if (!newPlayer) {
             res.status(400).json({ message: "Failed to create player" });

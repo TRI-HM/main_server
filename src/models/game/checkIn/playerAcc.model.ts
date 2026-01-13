@@ -7,7 +7,7 @@ export const CheckInPlayerModelSequelize = SequelizeDB.define('check_in_players'
   id: {
     type: DataTypes.STRING,
     primaryKey: true,
-    defaultValue: uuidv4(),
+    defaultValue: () => uuidv4(),
   },
   fullName: {
     type: DataTypes.STRING,

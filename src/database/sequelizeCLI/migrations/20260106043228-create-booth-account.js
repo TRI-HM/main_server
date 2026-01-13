@@ -17,12 +17,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      boothCode: {
+      booth_code: {
         type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'booths',
-          key: 'boothCode'
+          key: 'booth_code'
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
@@ -32,21 +32,21 @@ module.exports = {
         allowNull: false,
         defaultValue: 'staff',
       },
-      isActive: {
+      is_active: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
-      updatedAt: {
+      updated_at: {
         allowNull: true,
         type: Sequelize.DATE,
       },
-      deletedAt: {
+      deleted_at: {
         allowNull: true,
         type: Sequelize.DATE
       }

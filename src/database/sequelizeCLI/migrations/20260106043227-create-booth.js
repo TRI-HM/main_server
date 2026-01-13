@@ -9,35 +9,35 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      boothCode: {
+      booth_code: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
       },
-      boothName: {
+      booth_name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      areaCode: {
+      area_code: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      isActive: {
+      is_active: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: true,
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
-      deletedAt: {
+      deleted_at: {
         allowNull: true,
         type: Sequelize.DATE
       }

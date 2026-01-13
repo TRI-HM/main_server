@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      mediaId: {
+      media_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -25,12 +25,12 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      isValid: {
+      is_valid: {
         type: Sequelize.BOOLEAN,
         allowNull: true,
         defaultValue: null
       },
-      validateOrder: {
+      validate_order: {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: null

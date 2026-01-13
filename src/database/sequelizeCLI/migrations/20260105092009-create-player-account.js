@@ -10,7 +10,7 @@ module.exports = {
         type: Sequelize.STRING,
         defaultValue: uuidv4()
       },
-      fullName: {
+      full_name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -23,25 +23,25 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      qrCode: {
+      qr_code: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      isCompleted: {
+      is_completed: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false,
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: true
       },
-      deletedAt: {
+      deleted_at: {
         type: Sequelize.DATE,
         allowNull: true,
       },
@@ -56,9 +56,9 @@ module.exports = {
           name: 'idx_phone',
         },
         {
-          fields: ['createdAt'],
+          fields: ['created_at'],
           using: 'BTREE',
-          name: 'idx_createdAt',
+          name: 'idx_created_at',
         }
       ],
     });

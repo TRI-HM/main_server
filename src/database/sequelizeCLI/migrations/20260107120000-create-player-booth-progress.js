@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      playerId: {
+      player_id: {
         type: Sequelize.STRING,
         allowNull: false,
         references: {
@@ -19,17 +19,17 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },
-      boothCode: {
+      booth_code: {
         type: Sequelize.STRING,
         allowNull: false,
         references: {
           model: 'booths',
-          key: 'boothCode'
+          key: 'booth_code'
         },
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },
-      verifiedByAccountId: {
+      verified_by_account_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -39,21 +39,21 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'RESTRICT'
       },
-      verifiedAt: {
+      verified_at: {
         type: Sequelize.DATE,
         allowNull: false
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
-      deletedAt: {
+      deleted_at: {
         allowNull: true,
         type: Sequelize.DATE
       }

@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      imageUrl: {
+      image_url: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
-      quantityRemaining: {
+      quantity_remaining: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
@@ -33,16 +33,16 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
       },
-      updatedAt: {
+      updated_at: {
         allowNull: true,
         type: Sequelize.DATE
       },
-      deletedAt: {
+      deleted_at: {
         allowNull: true,
         type: Sequelize.DATE
       }

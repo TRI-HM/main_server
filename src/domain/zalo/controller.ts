@@ -1,4 +1,4 @@
-import { wrapAsync } from "../../middleware/wrapAsync";
+import { wrapAsync } from "../../util/wrapAsync";
 import { Request, Response } from "express";
 import path from "path";
 import axios from "axios";

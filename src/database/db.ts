@@ -11,14 +11,13 @@ const SequelizeDB = new Sequelize(
     dialect: "mysql",
     port: DBConfig.PORT,
     logging: false,
-    // Sử dụng camelCase cho tên cột (không dùng created_at, updated_at)
+    // Sử dụng underscore cho tên cột (dùng created_at, updated_at)
     define: {
       timestamps: true,
-      underscored: false,
+      underscored: true,
       paranoid: true,
     },
     timezone: "+07:00",
-  }
-)
+  });
 
 export default SequelizeDB;

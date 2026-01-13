@@ -1,0 +1,463 @@
+{
+  "info": {
+    "_postman_id": "checkin-game-api",
+    "name": "CheckIn Game API",
+    "description": "Collection cho CheckIn Game APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Player",
+      "item": [
+        {
+          "name": "Create Player",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyễn Văn A\",\n  \"phone\": \"0912345678\",\n  \"email\": \"nguyenvana@example.com\",\n  \"qrCode\": \"QR123456789\",\n  \"isCompleted\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/player/create",
+              "host": ["{{base_url}}"],
+              "path": ["player", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get One Player",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/get/:id",
+              "host": ["{{base_url}}"],
+              "path": ["player", "get", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "player-id-here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Players",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/getAll?limit=10&cursorId=0",
+              "host": ["{{base_url}}"],
+              "path": ["player", "getAll"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "cursorId",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Player",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nguyễn Văn B\",\n  \"isCompleted\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/player/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["player", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "player-id-here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Player",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/delete/:id",
+              "host": ["{{base_url}}"],
+              "path": ["player", "delete", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "player-id-here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Players",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/search?input=0912",
+              "host": ["{{base_url}}"],
+              "path": ["player", "search"],
+              "query": [
+                {
+                  "key": "input",
+                  "value": "0912"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Check Player Exists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player/checkExists?phone=0912345678",
+              "host": ["{{base_url}}"],
+              "path": ["player", "checkExists"],
+              "query": [
+                {
+                  "key": "phone",
+                  "value": "0912345678"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booth",
+      "item": [
+        {
+          "name": "Create Booth",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"boothCode\": \"BOOTH001\",\n  \"boothName\": \"Booth Quà tặng số 1\",\n  \"areaCode\": \"AREA01\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/booth/create",
+              "host": ["{{base_url}}"],
+              "path": ["booth", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get One Booth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/booth/get/:boothCode",
+              "host": ["{{base_url}}"],
+              "path": ["booth", "get", ":boothCode"],
+              "variable": [
+                {
+                  "key": "boothCode",
+                  "value": "BOOTH001"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Booths",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/booth/getAll",
+              "host": ["{{base_url}}"],
+              "path": ["booth", "getAll"]
+            }
+          }
+        },
+        {
+          "name": "Update Booth",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"boothName\": \"Booth Quà tặng số 1 - Updated\",\n  \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/booth/update/:boothCode",
+              "host": ["{{base_url}}"],
+              "path": ["booth", "update", ":boothCode"],
+              "variable": [
+                {
+                  "key": "boothCode",
+                  "value": "BOOTH001"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Booth",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/booth/delete/:boothCode",
+              "host": ["{{base_url}}"],
+              "path": ["booth", "delete", ":boothCode"],
+              "variable": [
+                {
+                  "key": "boothCode",
+                  "value": "BOOTH001"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Booth Account",
+      "item": [
+        {
+          "name": "Create Booth Account",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"staff001\",\n  \"password\": \"password123\",\n  \"boothCode\": \"BOOTH001\",\n  \"role\": \"staff\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/booth-account/create",
+              "host": ["{{base_url}}"],
+              "path": ["booth-account", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get Booth Account by Username",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/booth-account/get/:username",
+              "host": ["{{base_url}}"],
+              "path": ["booth-account", "get", ":username"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "staff001"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Booth Account",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"manager\",\n  \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/booth-account/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["booth-account", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Gift",
+      "item": [
+        {
+          "name": "Create Gift",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Áo thun\",\n  \"imageUrl\": \"https://example.com/image.jpg\",\n  \"quantity\": 100,\n  \"quantityRemaining\": 100,\n  \"description\": \"Áo thun cao cấp\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gift/create",
+              "host": ["{{base_url}}"],
+              "path": ["gift", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get All Gifts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/gift/getAll",
+              "host": ["{{base_url}}"],
+              "path": ["gift", "getAll"]
+            }
+          }
+        },
+        {
+          "name": "Update Gift",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantityRemaining\": 95,\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/gift/update/:id",
+              "host": ["{{base_url}}"],
+              "path": ["gift", "update", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Player Booth Progress",
+      "item": [
+        {
+          "name": "Create Player Booth Progress",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"playerId\": \"abc-123-def\",\n  \"boothCode\": \"BOOTH001\",\n  \"verifiedByAccountId\": 1,\n  \"verifiedAt\": \"2026-01-12T10:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/player-booth-progress/create",
+              "host": ["{{base_url}}"],
+              "path": ["player-booth-progress", "create"]
+            }
+          }
+        },
+        {
+          "name": "Get Progress by Booth Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player-booth-progress/booth/:boothCode",
+              "host": ["{{base_url}}"],
+              "path": ["player-booth-progress", "booth", ":boothCode"],
+              "variable": [
+                {
+                  "key": "boothCode",
+                  "value": "BOOTH001"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Progress by Player ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/player-booth-progress/player/:playerId",
+              "host": ["{{base_url}}"],
+              "path": ["player-booth-progress", "player", ":playerId"],
+              "variable": [
+                {
+                  "key": "playerId",
+                  "value": "abc-123-def"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000/api/game/pepsi",
+      "type": "string"
+    }
+  ]
+}

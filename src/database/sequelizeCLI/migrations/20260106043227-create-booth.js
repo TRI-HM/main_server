@@ -2,23 +2,30 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('boothstaffs', {
+    await queryInterface.createTable('booths', {
       id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER
       },
-      username: {
+      boothCode: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      boothName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      password: {
+      areaCode: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      boothNumber: {
-        type: Sequelize.INTEGER,
+      isActive: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
+        defaultValue: true,
       },
       createdAt: {
         allowNull: false,
@@ -26,8 +33,9 @@ module.exports = {
         defaultValue: new Date()
       },
       updatedAt: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: new Date()
       },
       deletedAt: {
         allowNull: true,
@@ -36,6 +44,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('boothstaffs');
+    await queryInterface.dropTable('booths');
   }
 };

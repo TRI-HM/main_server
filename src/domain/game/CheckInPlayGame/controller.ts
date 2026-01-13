@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { wrapAsync } from "../../../util/wrapAsync";
-import playerService from "../../../services/game/CheckInPlayGame/playerService";
-import { PlayerModelType, PlayerDataModelTypeParse } from "../../../models/game/CheckInPlayGame/player";
-import giftService from "../../../services/game/CheckInPlayGame/giftService";
-import adminService from "../../../services/game/CheckInPlayGame/adminService";
+import playerService from "../checkIn/player.service";
+import { PlayerModelType } from "../../../models/game/checkIn/playerAcc.model";
+import giftService from "../checkIn/giftService";
+import adminService from "../checkIn/boothAccount.service";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 const OTPGenerator = require("../../../util/otpGenerator");
@@ -15,7 +15,7 @@ const getOTP = wrapAsync(async (req: Request, res: Response) => {
         return;
     }
     let otp = await OTPGenerator.generateOTP(phone);
-    res.status(200).json({ message: "OTP generated successfully"});
+    res.status(200).json({ message: "OTP generated successfully" });
 });
 
 const verifyOTP = wrapAsync(async (req: Request, res: Response) => {
@@ -25,7 +25,7 @@ const verifyOTP = wrapAsync(async (req: Request, res: Response) => {
         return;
     }
     let isOtpValid = await OTPGenerator.IsOtpValid(phone, otp);
-    res.status(200).json({ message: "OTP verified successfully"});
+    res.status(200).json({ message: "OTP verified successfully" });
 });
 
 const createPlayer = wrapAsync(async (req: Request, res: Response) => {
@@ -38,7 +38,7 @@ const createPlayer = wrapAsync(async (req: Request, res: Response) => {
         let verifyCode = body.verifyCode;
         console.log("Username: ", username);
         console.log("Phone: ", phone);
-        if(!verifyCode || !OTPGenerator.IsOtpValid(phone, verifyCode)) {
+        if (!verifyCode || !OTPGenerator.IsOtpValid(phone, verifyCode)) {
             res.status(400).json({ message: "Invalid verify code or verify code expired" });
             return;
         }
@@ -51,11 +51,12 @@ const createPlayer = wrapAsync(async (req: Request, res: Response) => {
             res.status(400).json({ message: "Player already exists" });
             return;
         }
-        let playerData: PlayerModelType = {
-            username: username,
+        let playerData: any = {
+            fullName: username,
             phone: phone,
-            redeem: 0,
-            createdAt: new Date(),
+            email: email || "",
+            qrCode: "",
+            isCompleted: false,
         }
         let newPlayer = await playerService.createPlayer(playerData);
         let giftAble = await giftService.ValidateRedeemAble();
@@ -155,8 +156,8 @@ const updatePlayer = wrapAsync(async (req: Request, res: Response) => {
                 if (existingPlayer) {
                     // Trường này đã được sử dụng bởi player khác
                     const fieldName = field === 'phone' ? 'Số điện thoại' : field === 'username' ? 'Tên người dùng' : 'Email';
-                    res.status(400).json({ 
-                        message: `${fieldName} đã được sử dụng`, 
+                    res.status(400).json({
+                        message: `${fieldName} đã được sử dụng`,
                         field: field,
                         error: `${fieldName} đã được sử dụng bởi tài khoản khác`
                     });
@@ -173,7 +174,7 @@ const updatePlayer = wrapAsync(async (req: Request, res: Response) => {
         }
         res.status(200).json({ message: "Player updated successfully", data: playerUpdated });
     }
-    catch(error){
+    catch (error) {
         res.status(500).json({ message: "Failed to update player", error: error });
     }
 });
@@ -240,7 +241,7 @@ const createAdmin = wrapAsync(async (req: Request, res: Response) => {
             res.status(400).json({ message: "Failed to create admin" });
         }
         res.status(200).json({ message: "Admin created successfully", data: admin });
-    }catch(error){
+    } catch (error) {
         res.status(500).json({ message: "Failed to create admin", error: error });
     }
 });

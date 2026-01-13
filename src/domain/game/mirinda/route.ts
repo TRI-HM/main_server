@@ -1,6 +1,6 @@
 import { Router } from "express";
 import wishController from "./controller";
-import { uploadMulterHandle } from "../../../middleware/multher";
+import { uploadMulterHandle } from "../../../util/multher";
 
 const wishRouter = Router();
 

@@ -69,6 +69,7 @@ export interface IBoothAccountUseCase {
   getOneByUsername: (username: string) => Promise<BoothAccountModelType | null>;
   update: (id: number, boothAccount: BoothAccountModelClientType) => Promise<BoothAccountModelType | null>;
   getBoothCodeByUsername: (username: string) => Promise<BoothAccountModelType | null>;
+  login: (username: string, password: string) => Promise<BoothAccountModelType | null>;
 }
 
 const create = async (boothAccount: BoothAccountModelClientType): Promise<BoothAccountModelType | null> => {
@@ -115,9 +116,21 @@ const getBoothCodeByUsername = async (username: string): Promise<BoothAccountMod
   }
 }
 
+const login = async (username: string, password: string): Promise<BoothAccountModelType | null> => {
+  try {
+    const account = await BoothAccountModelSequelize.findOne({ where: { username } });
+    if (!account) return null;
+    return account.dataValues as BoothAccountModelType;
+  } catch (error) {
+    console.error('Error logging in booth account:', error);
+    return null;
+  }
+}
+
 export const boothAccountUseCase: IBoothAccountUseCase = {
   create,
   getOneByUsername,
   update,
   getBoothCodeByUsername,
+  login,
 }

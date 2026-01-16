@@ -23,11 +23,16 @@ const getBoothCodeByUsername = async (username: string): Promise<BoothAccountMod
     return await boothAccountUseCase.getBoothCodeByUsername(username);
 }
 
+const loginBoothAccount = async (username: string, password: string): Promise<BoothAccountModelType | null> => {
+    return await boothAccountUseCase.login(username, password);
+}
+
 const boothAccountService: IBoothAccountUseCase = {
     create: createBoothAccount,
     getOneByUsername,
     update: updateBoothAccount,
     getBoothCodeByUsername,
+    login: loginBoothAccount,
 };
 
 export default boothAccountService;

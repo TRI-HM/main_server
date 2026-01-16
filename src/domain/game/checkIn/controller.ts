@@ -337,6 +337,25 @@ export const createPlayerBoothProgressWithBoothAccountAndPhoneNumber = wrapAsync
     }
 });
 
+export const loginBoothAccount = wrapAsync(async (req: Request, res: Response) => {
+    try {
+        const username: string = req.body.username;
+        const password: string = req.body.password;
+        if (!username || !password) {
+            res.status(400).json(ioCustom.toResponseError({ code: 400, message: "Username and password are required" }));
+            return;
+        }
+        let boothAccount = await boothAccountService.login(username, password);
+        if (!boothAccount) {
+            res.status(404).json(ioCustom.toResponseError({ code: 404, message: "Invalid username or password" }));
+            return;
+        }
+        res.status(200).json(ioCustom.toResponse(200, "Booth account logged in successfully", true));
+    } catch (error) {
+        res.status(500).json(ioCustom.toResponseError({ code: 500, message: "Failed to login booth account" }, error));
+    }
+});
+
 const checkInController = {
     // Player
     createPlayer,
@@ -356,6 +375,7 @@ const checkInController = {
     createBoothAccount,
     updateBoothAccount,
     getBoothAccountByUsername,
+    loginBoothAccount,
     // Gift
     createGift,
     updateGift,

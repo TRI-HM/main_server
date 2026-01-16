@@ -5,12 +5,12 @@ import playerService from "../../../services/game/checkIn/player.service";
 import boothService from "../../../services/game/checkIn/booths.service";
 import boothAccountService from "../../../services/game/checkIn/boothAccount.service";
 import giftService from "../../../services/game/checkIn/giftService";
-import playerBoothProgressService from "../../../services/game/checkIn/playerBoothProgress.service";
 import { CheckInPlayerModelClientType } from "../../../models/game/checkIn/playerAcc.model";
 import { BoothModelClientType } from "../../../models/game/checkIn/booths.model";
 import { BoothAccountModelClientType } from "../../../models/game/checkIn/boothAcc.model";
 import { GiftModelClientType } from "../../../models/game/checkIn/gift.model";
 import { PlayerBoothProgressModelClientType } from "../../../models/game/checkIn/playerBoothProgress.model";
+import playerBoothProgressService from "../../../services/game/checkIn/playerBoothProgress.service";
 
 // ==================== Player Controllers ====================
 export const createPlayer = wrapAsync(async (req: Request, res: Response) => {
@@ -192,7 +192,7 @@ export const deleteBooth = wrapAsync(async (req: Request, res: Response) => {
 export const createBoothAccount = wrapAsync(async (req: Request, res: Response) => {
     try {
         const boothAccount: BoothAccountModelClientType = req.body;
-        let newBoothAccount = await boothAccountService.createBoothAccount(boothAccount);
+        let newBoothAccount = await boothAccountService.create(boothAccount);
         if (!newBoothAccount) {
             res.status(400).json(ioCustom.toResponseError({ code: 400, message: "Failed to create booth account" }));
             return;
@@ -207,7 +207,7 @@ export const updateBoothAccount = wrapAsync(async (req: Request, res: Response) 
     try {
         const id: number = parseInt(req.params.id);
         const boothAccount: BoothAccountModelClientType = req.body;
-        let updatedBoothAccount = await boothAccountService.updateBoothAccount(id, boothAccount);
+        let updatedBoothAccount = await boothAccountService.update(id, boothAccount);
         if (!updatedBoothAccount) {
             res.status(400).json(ioCustom.toResponseError({ code: 400, message: "Failed to update booth account" }));
             return;
@@ -318,6 +318,25 @@ export const getPlayerBoothProgressByPlayerId = wrapAsync(async (req: Request, r
     }
 });
 
+export const createPlayerBoothProgressWithBoothAccountAndPhoneNumber = wrapAsync(async (req: Request, res: Response) => {
+    try {
+        const boothAccount: string = req.params.boothAccount;
+        const phoneNumber: string = req.params.phoneNumber;
+        if (!boothAccount || !phoneNumber) {
+            res.status(400).json(ioCustom.toResponseError({ code: 400, message: "Booth account and phone number are required" }));
+            return;
+        }
+        let newPlayerBoothProgress = await playerBoothProgressService.createPlayerBoothProgressWithBoothAccountAndPhoneNumber(boothAccount, phoneNumber);
+        if (!newPlayerBoothProgress) {
+            res.status(400).json(ioCustom.toResponseError({ code: 400, message: "Failed to create player booth progress with booth account and phone number" }));
+            return;
+        }
+        res.status(200).json(ioCustom.toResponse(200, "Player booth progress created successfully with booth account and phone number", newPlayerBoothProgress));
+    } catch (error) {
+        res.status(500).json(ioCustom.toResponseError({ code: 500, message: "Failed to create player booth progress with booth account and phone number" }, error));
+    }
+});
+
 const checkInController = {
     // Player
     createPlayer,
@@ -343,6 +362,7 @@ const checkInController = {
     getAllGifts,
     // Player Booth Progress
     createPlayerBoothProgress,
+    createPlayerBoothProgressWithBoothAccountAndPhoneNumber,
     getPlayerBoothProgressByBoothCode,
     getPlayerBoothProgressByPlayerId,
 };

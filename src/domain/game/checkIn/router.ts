@@ -31,7 +31,8 @@ router.get("/gift/getAll", checkInController.getAllGifts); // GET /api/game/chec
 
 // ==================== Player Booth Progress Routes ====================
 router.post("/player-booth-progress/create", checkInController.createPlayerBoothProgress); // POST /api/game/check-in/player-booth-progress/create
-router.get("/player-booth-progress/booth/:boothCode", checkInController.getPlayerBoothProgressByBoothCode); // GET /api/game/checkIn/player-booth-progress/booth/:boothCode
-router.get("/player-booth-progress/player/:playerId", checkInController.getPlayerBoothProgressByPlayerId); // GET /api/game/checkIn/player-booth-progress/player/:playerId
+router.post("/player-booth-progress/create/:boothAccount/:phoneNumber", checkInController.createPlayerBoothProgressWithBoothAccountAndPhoneNumber); // POST /api/game/check-in/player-booth-progress/create/:boothAccount/:phoneNumber
+router.get("/player-booth-progress/booth/:boothCode", checkInController.getPlayerBoothProgressByBoothCode); // GET /api/game/check-in/player-booth-progress/booth/:boothCode
+router.get("/player-booth-progress/player/:playerId", checkInController.getPlayerBoothProgressByPlayerId); // GET /api/game/check-in/player-booth-progress/player/:playerId
 
 export default router;

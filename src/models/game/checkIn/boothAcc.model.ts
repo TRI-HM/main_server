@@ -68,6 +68,7 @@ export interface IBoothAccountUseCase {
   create: (boothAccount: BoothAccountModelClientType) => Promise<BoothAccountModelType | null>;
   getOneByUsername: (username: string) => Promise<BoothAccountModelType | null>;
   update: (id: number, boothAccount: BoothAccountModelClientType) => Promise<BoothAccountModelType | null>;
+  getBoothCodeByUsername: (username: string) => Promise<BoothAccountModelType | null>;
 }
 
 const create = async (boothAccount: BoothAccountModelClientType): Promise<BoothAccountModelType | null> => {
@@ -103,8 +104,20 @@ const update = async (id: number, boothAccount: BoothAccountModelClientType): Pr
   }
 }
 
+const getBoothCodeByUsername = async (username: string): Promise<BoothAccountModelType | null> => {
+  try {
+    const account = await BoothAccountModelSequelize.findOne({ where: { username } });
+    if (!account) return null;
+    return account.dataValues as BoothAccountModelType;
+  } catch (error) {
+    console.error('Error getting booth code by username:', error);
+    return null;
+  }
+}
+
 export const boothAccountUseCase: IBoothAccountUseCase = {
   create,
   getOneByUsername,
   update,
+  getBoothCodeByUsername,
 }

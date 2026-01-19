@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { wrapAsync } from "../../../middleware/wrapAsync";
+import { wrapAsync } from "../../../util/wrapAsync";
 import mediaService from "../../../services/mediaService";
 import wishesService from "../../../services/game/mirinda/wishesService";
 import localStorage from "../../../util/localStorage";

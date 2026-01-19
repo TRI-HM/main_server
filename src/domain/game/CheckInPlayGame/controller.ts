@@ -6,16 +6,36 @@ import giftService from "../../../services/game/CheckInPlayGame/giftService";
 import adminService from "../../../services/game/CheckInPlayGame/adminService";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-const OTPGenerator = require("../../../util/otpGenerator");
+import zaloController from "../../zalo/controller";
+import OTPGenerator from "../../../util/otpGenerator";
 
 const getOTP = wrapAsync(async (req: Request, res: Response) => {
-    const { phone } = req.body;
-    if (!phone) {
-        res.status(400).json({ message: "Phone is required" });
-        return;
+    try {
+        const { phone } = req.body;
+        if (!phone) {
+            res.status(400).json({ message: "Phone is required" });
+            return;
+        }
+        let templateId = "524969";
+        let otp = await OTPGenerator.generateOTP(phone);
+        if (!otp) {
+            res.status(500).json({ message: "Failed to generate OTP" });
+            return;
+        }
+        let messageId = await zaloController.sendZNSMessage(phone, templateId, { otp: otp });
+        if (!messageId) {
+            res.status(400).json({ message: "Failed to send OTP via Zalo" });
+            return;
+        }
+        res.status(200).json({ message: "OTP generated successfully"});
+    } catch (error: any) {
+        console.error("Error in getOTP:", error);
+        if (error.message && error.message.includes('connect')) {
+            res.status(500).json({ message: "Redis connection error. Please check Redis server." });
+        } else {
+            res.status(500).json({ message: "Failed to generate OTP", error: error.message });
+        }
     }
-    let otp = await OTPGenerator.generateOTP(phone);
-    res.status(200).json({ message: "OTP generated successfully"});
 });
 
 const verifyOTP = wrapAsync(async (req: Request, res: Response) => {
@@ -25,6 +45,10 @@ const verifyOTP = wrapAsync(async (req: Request, res: Response) => {
         return;
     }
     let isOtpValid = await OTPGenerator.IsOtpValid(phone, otp);
+    if (!isOtpValid) {
+        res.status(400).json({ message: "Invalid OTP" });
+        return;
+    }
     res.status(200).json({ message: "OTP verified successfully"});
 });
 
@@ -331,6 +355,8 @@ const CheckInPlayGameController = {
     AdminSignin,
     createAdmin,
     getAllPlayers,
-    updatePlayer
+    updatePlayer,
+    getOTP,
+    verifyOTP
 }
 export default CheckInPlayGameController;

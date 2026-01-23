@@ -23,6 +23,8 @@ router.delete("/booth/delete/:boothCode", checkInController.deleteBooth); // DEL
 router.post("/booth-account/create", checkInController.createBoothAccount); // POST /api/game/check-in/booth-account/create
 router.patch("/booth-account/update/:id", checkInController.updateBoothAccount); // PATCH /api/game/check-in/booth-account/update/:id
 router.get("/booth-account/get/:username", checkInController.getBoothAccountByUsername); // GET /api/game/check-in/booth-account/get/:username
+router.get("/booth-account/getAll", checkInController.getAllBoothAccounts); // GET /api/game/check-in/booth-account/getAll
+router.get("/booth-account/getAllActive", checkInController.getAllActiveBoothAccounts); // GET /api/game/check-in/booth-account/getAllActive
 router.post("/booth-account/login", checkInController.loginBoothAccount); // POST /api/game/check-in/booth-account/login
 
 // ==================== Gift Routes ====================

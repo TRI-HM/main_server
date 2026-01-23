@@ -70,6 +70,8 @@ export interface IBoothAccountUseCase {
   update: (id: number, boothAccount: BoothAccountModelClientType) => Promise<BoothAccountModelType | null>;
   getBoothCodeByUsername: (username: string) => Promise<BoothAccountModelType | null>;
   login: (username: string, password: string) => Promise<BoothAccountModelType | null>;
+  getAll: () => Promise<BoothAccountModelType[] | null>;
+  getAllActive: () => Promise<BoothAccountModelType[] | null>;
 }
 
 const create = async (boothAccount: BoothAccountModelClientType): Promise<BoothAccountModelType | null> => {
@@ -127,10 +129,34 @@ const login = async (username: string, password: string): Promise<BoothAccountMo
   }
 }
 
+const getAll = async (): Promise<BoothAccountModelType[] | null> => {
+  try {
+    const accounts = await BoothAccountModelSequelize.findAll();
+    if (!accounts) return null;
+    return accounts.map(account => account.dataValues as BoothAccountModelType);
+  } catch (error) {
+    console.error('Error getting all booth accounts:', error);
+    return null;
+  }
+}
+
+const getAllActive = async (): Promise<BoothAccountModelType[] | null> => {
+  try {
+    const accounts = await BoothAccountModelSequelize.findAll({ where: { isActive: true } });
+    if (!accounts) return null;
+    return accounts.map(account => account.dataValues as BoothAccountModelType);
+  } catch (error) {
+    console.error('Error getting all active booth accounts:', error);
+    return null;
+  }
+}
+
 export const boothAccountUseCase: IBoothAccountUseCase = {
   create,
   getOneByUsername,
   update,
   getBoothCodeByUsername,
   login,
+  getAll,
+  getAllActive,
 }

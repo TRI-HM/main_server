@@ -27,12 +27,30 @@ const loginBoothAccount = async (username: string, password: string): Promise<Bo
     return await boothAccountUseCase.login(username, password);
 }
 
+const getAllBoothAccounts = async (): Promise<BoothAccountModelType[] | null> => {
+    let accounts = await boothAccountUseCase.getAll();
+    if (!accounts || accounts.length === 0) {
+        return null;
+    }
+    return accounts;
+}
+
+const getAllActiveBoothAccounts = async (): Promise<BoothAccountModelType[] | null> => {
+    let accounts = await boothAccountUseCase.getAllActive();
+    if (!accounts || accounts.length === 0) {
+        return null;
+    }
+    return accounts;
+}
+
 const boothAccountService: IBoothAccountUseCase = {
     create: createBoothAccount,
     getOneByUsername,
     update: updateBoothAccount,
     getBoothCodeByUsername,
     login: loginBoothAccount,
+    getAll: getAllBoothAccounts,
+    getAllActive: getAllActiveBoothAccounts,
 };
 
 export default boothAccountService;

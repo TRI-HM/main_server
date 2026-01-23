@@ -44,6 +44,14 @@ module.exports = {
         created_at: new Date(),
         updated_at: new Date(),
       },
+      {
+        booth_code: 'BOOTH006',
+        booth_name: 'Gian hàng 6 - Khu vực C',
+        area_code: 'AREA_C',
+        is_active: false,
+        created_at: new Date(),
+        updated_at: new Date(),
+      },
     ], {});
   },
 

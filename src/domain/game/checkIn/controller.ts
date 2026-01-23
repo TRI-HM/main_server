@@ -232,6 +232,32 @@ export const getBoothAccountByUsername = wrapAsync(async (req: Request, res: Res
     }
 });
 
+export const getAllBoothAccounts = wrapAsync(async (req: Request, res: Response) => {
+    try {
+        let boothAccounts = await boothAccountService.getAll();
+        if (!boothAccounts) {
+            res.status(404).json(ioCustom.toResponseError({ code: 404, message: "No booth accounts found" }));
+            return;
+        }
+        res.status(200).json(ioCustom.toResponse(200, "Booth accounts retrieved successfully", boothAccounts));
+    } catch (error) {
+        res.status(500).json(ioCustom.toResponseError({ code: 500, message: "Failed to get booth accounts" }, error));
+    }
+});
+
+export const getAllActiveBoothAccounts = wrapAsync(async (req: Request, res: Response) => {
+    try {
+        let boothAccounts = await boothAccountService.getAllActive();
+        if (!boothAccounts) {
+            res.status(404).json(ioCustom.toResponseError({ code: 404, message: "No active booth accounts found" }));
+            return;
+        }
+        res.status(200).json(ioCustom.toResponse(200, "Active booth accounts retrieved successfully", boothAccounts));
+    } catch (error) {
+        res.status(500).json(ioCustom.toResponseError({ code: 500, message: "Failed to get active booth accounts" }, error));
+    }
+});
+
 // ==================== Gift Controllers ====================
 export const createGift = wrapAsync(async (req: Request, res: Response) => {
     try {
@@ -345,6 +371,8 @@ export const loginBoothAccount = wrapAsync(async (req: Request, res: Response) =
             res.status(400).json(ioCustom.toResponseError({ code: 400, message: "Username and password are required" }));
             return;
         }
+        console.log("username", username);
+        console.log("password", password);
         let boothAccount = await boothAccountService.login(username, password);
         if (!boothAccount) {
             res.status(404).json(ioCustom.toResponseError({ code: 404, message: "Invalid username or password" }));
@@ -375,6 +403,8 @@ const checkInController = {
     createBoothAccount,
     updateBoothAccount,
     getBoothAccountByUsername,
+    getAllBoothAccounts,
+    getAllActiveBoothAccounts,
     loginBoothAccount,
     // Gift
     createGift,

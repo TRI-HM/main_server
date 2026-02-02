@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import zaloController from "../../zalo/controller";
 import OTPGenerator from "../../../util/otpGenerator";
+import ioCustom from "../../../util/ioCustom";
+import { StatusCodes } from "http-status-codes";
 
 const getOTP = wrapAsync(async (req: Request, res: Response) => {
     try {
@@ -27,7 +29,7 @@ const getOTP = wrapAsync(async (req: Request, res: Response) => {
             res.status(400).json({ message: "Failed to send OTP via Zalo" });
             return;
         }
-        res.status(200).json({ message: "OTP generated successfully"});
+        res.status(200).json({ message: "OTP generated successfully" });
     } catch (error: any) {
         console.error("Error in getOTP:", error);
         if (error.message && error.message.includes('connect')) {
@@ -41,15 +43,23 @@ const getOTP = wrapAsync(async (req: Request, res: Response) => {
 const verifyOTP = wrapAsync(async (req: Request, res: Response) => {
     const { phone, otp } = req.body;
     if (!phone || !otp) {
-        res.status(400).json({ message: "Phone and OTP are required" });
+        res
+            .status(StatusCodes.BAD_REQUEST)
+            .json(ioCustom.toResponseError(
+                { code: StatusCodes.BAD_REQUEST, message: "Phone and OTP are required" }));
         return;
     }
     let isOtpValid = await OTPGenerator.IsOtpValid(phone, otp);
     if (!isOtpValid) {
-        res.status(400).json({ message: "Invalid OTP" });
+        res
+            .status(StatusCodes.BAD_REQUEST)
+            .json(ioCustom.toResponseError(
+                { code: StatusCodes.BAD_REQUEST, message: "Invalid OTP" }));
         return;
     }
-    res.status(200).json({ message: "OTP verified successfully"});
+    res
+        .status(200)
+        .json(ioCustom.toResponse(StatusCodes.OK, "OTP verified successfully", { validate: true }));
 });
 
 const createPlayer = wrapAsync(async (req: Request, res: Response) => {

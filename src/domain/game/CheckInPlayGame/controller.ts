@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import zaloController from "../../zalo/controller";
 import OTPGenerator from "../../../util/otpGenerator";
+import ioCustom from "../../../util/ioCustom";
+import { StatusCodes } from "http-status-codes";
 
 const getOTP = wrapAsync(async (req: Request, res: Response) => {
     try {
@@ -27,7 +29,7 @@ const getOTP = wrapAsync(async (req: Request, res: Response) => {
             res.status(400).json({ message: "Failed to send OTP via Zalo" });
             return;
         }
-        res.status(200).json({ message: "OTP generated successfully"});
+        res.status(200).json({ message: "OTP generated successfully" });
     } catch (error: any) {
         console.error("Error in getOTP:", error);
         if (error.message && error.message.includes('connect')) {
@@ -41,15 +43,23 @@ const getOTP = wrapAsync(async (req: Request, res: Response) => {
 const verifyOTP = wrapAsync(async (req: Request, res: Response) => {
     const { phone, otp } = req.body;
     if (!phone || !otp) {
-        res.status(400).json({ message: "Phone and OTP are required" });
+        res
+            .status(StatusCodes.BAD_REQUEST)
+            .json(ioCustom.toResponseError(
+                { code: StatusCodes.BAD_REQUEST, message: "Phone and OTP are required" }));
         return;
     }
     let isOtpValid = await OTPGenerator.IsOtpValid(phone, otp);
     if (!isOtpValid) {
-        res.status(400).json({ message: "Invalid OTP" });
+        res
+            .status(StatusCodes.BAD_REQUEST)
+            .json(ioCustom.toResponseError(
+                { code: StatusCodes.BAD_REQUEST, message: "Invalid OTP" }));
         return;
     }
-    res.status(200).json({ message: "OTP verified successfully"});
+    res
+        .status(200)
+        .json(ioCustom.toResponse(StatusCodes.OK, "OTP verified successfully", { validate: true }));
 });
 
 const createPlayer = wrapAsync(async (req: Request, res: Response) => {
@@ -62,7 +72,7 @@ const createPlayer = wrapAsync(async (req: Request, res: Response) => {
         let verifyCode = body.verifyCode;
         console.log("Username: ", username);
         console.log("Phone: ", phone);
-        if(!verifyCode || !OTPGenerator.IsOtpValid(phone, verifyCode)) {
+        if (!verifyCode || !OTPGenerator.IsOtpValid(phone, verifyCode)) {
             res.status(400).json({ message: "Invalid verify code or verify code expired" });
             return;
         }
@@ -179,8 +189,8 @@ const updatePlayer = wrapAsync(async (req: Request, res: Response) => {
                 if (existingPlayer) {
                     // Trường này đã được sử dụng bởi player khác
                     const fieldName = field === 'phone' ? 'Số điện thoại' : field === 'username' ? 'Tên người dùng' : 'Email';
-                    res.status(400).json({ 
-                        message: `${fieldName} đã được sử dụng`, 
+                    res.status(400).json({
+                        message: `${fieldName} đã được sử dụng`,
                         field: field,
                         error: `${fieldName} đã được sử dụng bởi tài khoản khác`
                     });
@@ -197,7 +207,7 @@ const updatePlayer = wrapAsync(async (req: Request, res: Response) => {
         }
         res.status(200).json({ message: "Player updated successfully", data: playerUpdated });
     }
-    catch(error){
+    catch (error) {
         res.status(500).json({ message: "Failed to update player", error: error });
     }
 });
@@ -264,7 +274,7 @@ const createAdmin = wrapAsync(async (req: Request, res: Response) => {
             res.status(400).json({ message: "Failed to create admin" });
         }
         res.status(200).json({ message: "Admin created successfully", data: admin });
-    }catch(error){
+    } catch (error) {
         res.status(500).json({ message: "Failed to create admin", error: error });
     }
 });

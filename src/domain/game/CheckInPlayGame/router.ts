@@ -15,6 +15,8 @@ PepsiGameRouter.get("/getAllPlayers", CheckInPlayGameController.getAllPlayers);
 PepsiGameRouter.put("/updatePlayer", CheckInPlayGameController.updatePlayer);
 PepsiGameRouter.get("/getGifts", GiftController.getGifts);
 PepsiGameRouter.put("/updateGift", GiftController.updateGift);
+
+//zalo
 PepsiGameRouter.post("/getOTP", CheckInPlayGameController.getOTP);
 PepsiGameRouter.post("/verifyOTP", CheckInPlayGameController.verifyOTP);
 

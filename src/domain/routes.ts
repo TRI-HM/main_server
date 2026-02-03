@@ -5,7 +5,7 @@ import vitaminRouter from "./game/vitamin/route";
 import loginRouter from "./login/route";
 import videoRouter from "./video/route";
 import aiRouter from "./ai/route";
-import PepsiGameRouter from "./game/CheckInPlayGame/router";
+import checkInRouter from "./game/checkIn/router";
 
 const router = Router();
 
@@ -15,9 +15,9 @@ router.get("/ping", (req, res) => {
 
 router.use("/user", userRouter);
 router.use("/image", imageRouter);
-router.use("/game/vitamin", vitaminRouter);
 router.use("/login", loginRouter);
 router.use("/video", videoRouter);
 router.use("/ai", aiRouter);
-router.use("/game/pepsi", PepsiGameRouter);
+router.use("/game/vitamin", vitaminRouter);
+router.use("/game/check-in", checkInRouter);
 export default router;

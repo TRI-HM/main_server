@@ -1,3 +1,19 @@
+// Load environment variables first, before any other imports
+import dotenv from 'dotenv';
+import path from 'path';
+
+const envResult = dotenv.config({ path: path.join(__dirname, '../.env') });
+if (envResult.error) {
+  console.warn('Warning: .env file not found or could not be loaded:', envResult.error.message);
+} else {
+  console.log('Environment variables loaded from .env file');
+}
+
+// Log Zalo env vars (without showing values for security)
+console.log('ZALO_AUTHORIZATION_CODE:', process.env.ZALO_AUTHORIZATION_CODE ? 'Set' : 'Not set');
+console.log('ZALO_SECRET_KEY:', process.env.ZALO_SECRET_KEY ? 'Set' : 'Not set');
+console.log('ZALO_APP_ID:', process.env.ZALO_APP_ID ? 'Set' : 'Not set');
+
 import { createServer } from 'http';
 import express from 'express';
 import cors from 'cors';
@@ -7,7 +23,6 @@ import { logger } from './middleware/logger';
 import { errorHandler } from './middleware/error';
 import routes from './domain/routes';
 import SequelizeDB from './database/db';
-import path from 'path';
 import zaloRouter from './domain/zalo/route';
 import wishRouter from './domain/game/mirinda/route';
 const app = express();

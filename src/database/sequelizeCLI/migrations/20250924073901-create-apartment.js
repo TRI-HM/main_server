@@ -8,7 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING
       },
-      idStaff: {
+      id_staff: {
         type: Sequelize.STRING,
         references: {
           model: 'real_estate_staffs',
@@ -40,15 +40,15 @@ module.exports = {
       note: {
         type: Sequelize.STRING,
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false
       },
-      deletedAt: {
+      deleted_at: {
         type: Sequelize.DATE,
       },
 

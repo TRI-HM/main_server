@@ -2,36 +2,40 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('gifts', {
+    await queryInterface.createTable('booth_accounts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
+      username: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
-      image_url: {
+      password: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
       },
-      quantity: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      quantity_remaining: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
-      description: {
+      booth_code: {
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
+        references: {
+          model: 'booths',
+          key: 'booth_code'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT'
+      },
+      role: {
+        type: Sequelize.ENUM('admin', 'staff', 'manager'),
+        allowNull: false,
+        defaultValue: 'staff',
       },
       is_active: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        allowNull: false,
+        defaultValue: true,
       },
       created_at: {
         allowNull: false,
@@ -40,7 +44,7 @@ module.exports = {
       },
       updated_at: {
         allowNull: true,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       deleted_at: {
         allowNull: true,
@@ -49,6 +53,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('gifts');
+    await queryInterface.dropTable('booth_accounts');
   }
 };

@@ -3,6 +3,10 @@ import checkInController from "./controller";
 
 const router = Router();
 
+//zalo
+router.post("/getOTP", checkInController.getOTP);
+router.post("/verifyOTP", checkInController.verifyOTP);
+
 // ==================== Player Routes ====================
 router.post("/player/create", checkInController.createPlayer); // POST /api/game/check-in/player/create
 router.patch("/player/update/:id", checkInController.updatePlayer); // PATCH /api/game/check-in/player/update/:id

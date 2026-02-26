@@ -1,0 +1,1 @@
+type ClientType = "display" | "game";

@@ -1,23 +1,24 @@
 import validateFields from "../../../util/validateField";
-import { GiftModelSequelize, GiftModelType, GiftModelClientType, giftUseCase } from "../../../models/game/checkIn/gift.model";
+import { GiftModelSequelize, GiftModelType } from "../../../models/game/checkIn/gift.model";
+import { GiftUseCase } from "../../../models/game/checkIn/gift.model";
 import { Op } from "sequelize";
 
-const createGift = async (gift: GiftModelClientType): Promise<GiftModelType | null> => {
+const createGift = async (gift: Record<any, any>) => {
     if (!validateFields(gift, GiftModelSequelize)) {
         return null;
     }
-    let newGift = await giftUseCase.create(gift);
+    let newGift = await GiftUseCase.create(gift);
     if (!newGift) {
         return null;
     }
     return newGift;
 }
 
-const updateGift = async (id: number, gift: GiftModelClientType): Promise<GiftModelType | null> => {
+const updateGift = async (id: number, gift: Record<any, any>) => {
     if (!validateFields(gift, GiftModelSequelize)) {
         return null;
     }
-    let updatedGift = await giftUseCase.update(id, gift);
+    let updatedGift = await GiftUseCase.update(id, gift);
     if (!updatedGift) {
         return null;
     }
@@ -25,26 +26,23 @@ const updateGift = async (id: number, gift: GiftModelClientType): Promise<GiftMo
 }
 
 const getAllGifts = async (): Promise<GiftModelType[] | null> => {
-    let gifts = await giftUseCase.getAll();
+    let gifts = await GiftUseCase.getAll();
     if (!gifts || gifts.length === 0) {
         return null;
     }
-    return gifts;
+    return gifts.map((gift: any) => gift.dataValues as GiftModelType);
 }
-
 const ValidateRedeemAble = async (): Promise<boolean> => {
-    let gifts = await giftUseCase.getAll();
-    if (!gifts || gifts.length === 0) {
+    let gift = await GiftUseCase.filter({ is_active: true, quantity: { [Op.gt]: 0 } });
+    if (!gift || gift.length === 0) {
         return false;
     }
-    // Check if there's any active gift with quantity > 0
-    const hasRedeemableGift = gifts.some(gift => gift.is_active && gift.quantityRemaining > 0);
-    return hasRedeemableGift;
+    return true;
 }
 
 export default {
     createGift,
     updateGift,
-    getAllGifts,
     ValidateRedeemAble,
+    getAllGifts,
 }

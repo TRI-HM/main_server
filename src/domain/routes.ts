@@ -19,5 +19,5 @@ router.use("/login", loginRouter);
 router.use("/video", videoRouter);
 router.use("/ai", aiRouter);
 router.use("/game/vitamin", vitaminRouter);
-router.use("/game/check-in", checkInRouter);
+// router.use("/game/check-in", checkInRouter);
 export default router;

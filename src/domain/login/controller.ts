@@ -23,13 +23,21 @@ export const register = wrapAsync(async (req, res) => {
 });
 
 export const signin = wrapAsync((req, res) => {
-  const { email, password } = req.body;
-  // Perform authentication logic here
-  const token = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: "1h" });
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ message: "Email and password are required" });
+      return;
+    }
+    // Perform authentication logic here
+    const token = jwt.sign({ email }, process.env.JWT_SECRET!, { expiresIn: "1h" });
 
-  const decoded = jwt.verify(token, process.env.JWT_SECRET!); // giải mã token, sẽ ra thông tin, bao gồm user , role, dùng để định danh. Khi xác thực định danh thì sẽ dùng thông tin này. Đúng định danh thì sẽ dùng data trong body.
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!); // giải mã token, sẽ ra thông tin, bao gồm user , role, dùng để định danh. Khi xác thực định danh thì sẽ dùng thông tin này. Đúng định danh thì sẽ dùng data trong body.
 
-  console.log(decoded); // This will log the decoded payload, which includes the email
+    console.log(decoded); // This will log the decoded payload, which includes the email
 
-  res.send({ message: "User signed in", data: { email, token } });
+    res.send({ message: "User signed in", data: { email, token } });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to sign in", error: error });
+  }
 });

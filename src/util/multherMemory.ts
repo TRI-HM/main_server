@@ -11,6 +11,6 @@ const imageFilter: multer.Options["fileFilter"] = (req, file, cb) => {
 /** Multer lưu file trong memory (buffer) — dùng trước khi upload cloud. */
 export const uploadImageMemory = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 15 * 1024 * 1024 },
+  limits: { fileSize: 10 * 1080 * 1920 },
   fileFilter: imageFilter,
 });

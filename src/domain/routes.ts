@@ -6,6 +6,7 @@ import loginRouter from "./login/route";
 import videoRouter from "./video/route";
 import aiRouter from "./ai/route";
 import checkInRouter from "./game/checkIn/router";
+import storageRouter from "./storage/route";
 
 const router = Router();
 
@@ -20,4 +21,5 @@ router.use("/video", videoRouter);
 router.use("/ai", aiRouter);
 router.use("/game/vitamin", vitaminRouter);
 // router.use("/game/check-in", checkInRouter);
+router.use("/storage", storageRouter);
 export default router;

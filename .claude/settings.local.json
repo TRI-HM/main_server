@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://api.kie.ai/api/v1/records/5f39b12fe14b0d377e4ad9e030e5c47a\" -H \"Authorization: Bearer 629a0b16506d9ea63ed692aa706ff259\")",
+      "Bash(__NEW_LINE_0ce2af7e049b94a0__ curl:*)",
+      "WebFetch(domain:docs.kie.ai)"
+    ]
+  }
+}

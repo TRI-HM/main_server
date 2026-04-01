@@ -90,7 +90,15 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
   }
 
   // --- Tạo tên file chung: {name}-{timestamp} ---
-  const safeName = name.trim().replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_-]/g, "");
+  const safeName = name
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/\s+/g, "_")
+    .replace(/[^a-zA-Z0-9_-]/g, "");
+  console.log("Safe name:", safeName);
   const timestamp = getTimestamp();
   const baseName = `${safeName}-${timestamp}`;
 
@@ -117,8 +125,10 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
   const aiTempUrl = await generateImage(apiKey, options);
 
   // --- Bước 3: Download ảnh AI và upload lên cloud storage ---
+  console.log("Downloading AI image from:", aiTempUrl);
   const aiImageResponse = await axios.get<ArrayBuffer>(aiTempUrl, {
     responseType: "arraybuffer",
+    timeout: 60000,
   });
   const aiBuffer = Buffer.from(aiImageResponse.data);
   const aiMimeType = `image/${aiOutputFormat === "png" ? "png" : "jpeg"}`;

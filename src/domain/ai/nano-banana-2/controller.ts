@@ -149,3 +149,42 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     })
   );
 });
+
+/** Route test để client gửi ảnh lên mà không cần generate AI và upload cloud storage, dùng ảnh mẫu có sẵn trên server */
+export const generateTest = wrapAsync(async (req: Request, res: Response) => {
+  const file = req.file;
+  const { name, prompt } = req.body;
+
+  if (!file?.buffer) {
+    res.status(StatusCodes.BAD_REQUEST).json(
+      ioCustom.toResponseError({
+        code: StatusCodes.BAD_REQUEST,
+        message: 'Thiếu file ảnh. Gửi multipart field tên "image".',
+      })
+    );
+    return;
+  }
+
+  if (!name || !prompt) {
+    res.status(StatusCodes.BAD_REQUEST).json(
+      ioCustom.toResponseError({
+        code: StatusCodes.BAD_REQUEST,
+        message: 'Thiếu "name" hoặc "prompt" trong body.',
+      })
+    );
+    return;
+  }
+
+  // Trả về URL tĩnh của ảnh mẫu trên server
+  const sampleImageUrl = `${req.protocol}://${req.get("host")}/images/test/image-test.jpg`;
+
+  setTimeout(() => {
+    res.status(StatusCodes.OK).json(
+      ioCustom.toResponse(StatusCodes.OK, "Test generate thành công", {
+        originalUrl: sampleImageUrl,
+        generatedUrl: sampleImageUrl,
+        baseName: name,
+      })
+    );
+  }, 10000);
+});

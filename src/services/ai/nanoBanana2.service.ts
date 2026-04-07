@@ -49,9 +49,7 @@ export interface NanoBanana2Options {
   prompt: string;
   /** Tỷ lệ ảnh (mặc định: "auto") */
   aspectRatio?: string;
-  /** Độ phân giải: "1K" | "2K" | "4K" (mặc định: "1K") */
-  resolution?: string;
-  /** Định dạng output: "png" | "jpg" (mặc định: "jpg") */
+  /** Định dạng output: "png" | "jpeg" (mặc định: "png") */
   outputFormat?: string;
 }
 
@@ -63,13 +61,12 @@ async function createTask(apiKey: string, options: NanoBanana2Options): Promise<
   const response = await axios.post<CreateTaskResponse>(
     `${KIE_BASE_URL}/createTask`,
     {
-      model: "nano-banana-2",
+      model: "google/nano-banana-edit",
       input: {
         prompt: options.prompt,
-        image_input: [options.imageUrl],
-        aspect_ratio: options.aspectRatio || "auto",
-        resolution: (options.resolution || "1K").toUpperCase(), // Normalize: "1k" → "1K"
-        output_format: (options.outputFormat || "jpg").toLowerCase(), // Normalize: "JPG" → "jpg"
+        image_urls: [options.imageUrl],
+        image_size: options.aspectRatio || "auto",
+        output_format: (options.outputFormat || "jpeg").toLowerCase(), // Normalize: "JPG" → "jpg"
       },
     },
     {

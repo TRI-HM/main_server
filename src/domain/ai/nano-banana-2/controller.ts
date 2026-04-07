@@ -32,9 +32,9 @@ async function compressImage(
     return { buffer: output, mimetype: "image/jpeg" };
   }
 
-  // Ước lượng quality dựa trên tỷ lệ kích thước
-  let quality = Math.round((targetBytes / buffer.length) * 100);
-  quality = Math.max(20, Math.min(quality, 85));
+  // Ước lượng quality dựa trên tỷ lệ kích thước (bù hệ số phi tuyến)
+  let quality = Math.round((targetBytes / buffer.length) * 100 * 1.8);
+  quality = Math.max(20, Math.min(quality, 92));
 
   let output = await sharp(buffer)
     .jpeg({ quality, mozjpeg: true })
@@ -42,9 +42,17 @@ async function compressImage(
 
   // Nếu vẫn còn lớn, giảm quality dần
   while (output.length > targetBytes && quality > 20) {
-    quality -= 10;
+    quality -= 5;
     output = await sharp(buffer)
       .jpeg({ quality: Math.max(20, quality), mozjpeg: true })
+      .toBuffer();
+  }
+
+  // Nếu quá nhỏ so với mục tiêu, tăng quality dần để tận dụng dung lượng
+  while (output.length < targetBytes * 0.7 && quality < 92) {
+    quality += 5;
+    output = await sharp(buffer)
+      .jpeg({ quality: Math.min(92, quality), mozjpeg: true })
       .toBuffer();
   }
 

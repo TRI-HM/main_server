@@ -12,11 +12,59 @@
 
 import { Request, Response } from "express";
 import axios from "axios";
+import sharp from "sharp";
 import { StatusCodes } from "http-status-codes";
 import { wrapAsync } from "../../../util/wrapAsync";
 import ioCustom from "../../../util/ioCustom";
 import { uploadImageBufferToPublicUrl } from "../../../services/storage/cloudStorage.service";
 import { generateImage, NanoBanana2Options } from "../../../services/ai/nanoBanana2.service";
+
+/** Nén ảnh xuống kích thước mục tiêu (mặc định ~200KB) */
+async function compressImage(
+  buffer: Buffer,
+  targetSizeKB: number = 200
+): Promise<{ buffer: Buffer; mimetype: string }> {
+  const targetBytes = targetSizeKB * 1024;
+
+  // Nếu ảnh đã nhỏ hơn mục tiêu, trả về nguyên bản dạng jpeg
+  if (buffer.length <= targetBytes) {
+    const output = await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
+    return { buffer: output, mimetype: "image/jpeg" };
+  }
+
+  // Ước lượng quality dựa trên tỷ lệ kích thước
+  let quality = Math.round((targetBytes / buffer.length) * 100);
+  quality = Math.max(20, Math.min(quality, 85));
+
+  let output = await sharp(buffer)
+    .jpeg({ quality, mozjpeg: true })
+    .toBuffer();
+
+  // Nếu vẫn còn lớn, giảm quality dần
+  while (output.length > targetBytes && quality > 20) {
+    quality -= 10;
+    output = await sharp(buffer)
+      .jpeg({ quality: Math.max(20, quality), mozjpeg: true })
+      .toBuffer();
+  }
+
+  // Nếu vẫn còn lớn, resize nhỏ lại
+  if (output.length > targetBytes) {
+    const metadata = await sharp(buffer).metadata();
+    const scale = Math.sqrt(targetBytes / output.length);
+    const newWidth = Math.round((metadata.width || 1024) * scale);
+    output = await sharp(buffer)
+      .resize(newWidth)
+      .jpeg({ quality: Math.max(20, quality), mozjpeg: true })
+      .toBuffer();
+  }
+
+  console.log(
+    `Image compressed: ${(buffer.length / 1024).toFixed(0)}KB → ${(output.length / 1024).toFixed(0)}KB (quality: ${quality})`
+  );
+
+  return { buffer: output, mimetype: "image/jpeg" };
+}
 
 /** Tạo timestamp dạng yyyyMMddHHmmssSSS */
 function getTimestamp(): string {
@@ -30,16 +78,6 @@ function getTimestamp(): string {
     String(now.getSeconds()).padStart(2, "0"),
     String(now.getMilliseconds()).padStart(3, "0"),
   ].join("");
-}
-
-/** Lấy extension từ mimetype: "image/png" → "png" */
-function extFromMime(mime: string): string {
-  const map: Record<string, string> = {
-    "image/jpeg": "jpg",
-    "image/png": "png",
-    "image/webp": "webp",
-  };
-  return map[mime] || "jpg";
 }
 
 /**
@@ -103,15 +141,15 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
   // const baseName = `${safeName}-${timestamp}`;
   const baseName = `${safeName}`; // Tạm thời bỏ timestamp
 
-  const originalExt = extFromMime(file.mimetype);
   const aiOutputFormat = output_format || "jpg";
 
-  // --- Bước 1: Upload ảnh gốc lên cloud storage ---
-  const originalFileName = `${baseName}-original.${originalExt}`;
+  // --- Bước 1: Nén ảnh gốc rồi upload lên cloud storage ---
+  const compressed = await compressImage(file.buffer, 200);
+  const originalFileName = `${baseName}-original.jpg`;
   const originalUrl = await uploadImageBufferToPublicUrl(
-    file.buffer,
+    compressed.buffer,
     originalFileName,
-    file.mimetype
+    compressed.mimetype
   );
 
   // --- Bước 2: Gọi Kie.ai NanoBanana2 để tạo ảnh AI ---
@@ -131,13 +169,14 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     timeout: 60000,
   });
   const aiBuffer = Buffer.from(aiImageResponse.data);
-  const aiMimeType = `image/${aiOutputFormat === "png" ? "png" : "jpeg"}`;
 
-  const generatedFileName = `${baseName}-generated.${aiOutputFormat}`;
+  // Nén ảnh AI xuống ~500KB trước khi upload
+  const compressedAi = await compressImage(aiBuffer, 500);
+  const generatedFileName = `${baseName}-generated.jpg`;
   const generatedUrl = await uploadImageBufferToPublicUrl(
-    aiBuffer,
+    compressedAi.buffer,
     generatedFileName,
-    aiMimeType
+    compressedAi.mimetype
   );
 
   // --- Trả về kết quả ---

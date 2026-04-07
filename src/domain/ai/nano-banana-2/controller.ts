@@ -118,7 +118,6 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     imageUrl: originalUrl,
     prompt,
     aspectRatio: aspect_ratio,
-    resolution,
     outputFormat: aiOutputFormat,
   };
 

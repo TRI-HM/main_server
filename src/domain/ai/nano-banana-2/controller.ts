@@ -55,7 +55,7 @@ function extFromMime(mime: string): string {
  */
 export const generate = wrapAsync(async (req: Request, res: Response) => {
   const file = req.file;
-  const { name, prompt, aspect_ratio, resolution, output_format } = req.body;
+  const { name, prompt, aspect_ratio, output_format } = req.body;
 
   // --- Validate input ---
   if (!file?.buffer) {
@@ -100,7 +100,8 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     .replace(/[^a-zA-Z0-9_-]/g, "");
   console.log("Safe name:", safeName);
   const timestamp = getTimestamp();
-  const baseName = `${safeName}-${timestamp}`;
+  // const baseName = `${safeName}-${timestamp}`;
+  const baseName = `${safeName}`; // Tạm thời bỏ timestamp
 
   const originalExt = extFromMime(file.mimetype);
   const aiOutputFormat = output_format || "jpg";
@@ -117,7 +118,7 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
   const options: NanoBanana2Options = {
     imageUrl: originalUrl,
     prompt,
-    aspectRatio: aspect_ratio,
+    aspectRatio: "9:16",
     outputFormat: aiOutputFormat,
   };
 

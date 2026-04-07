@@ -66,7 +66,7 @@ async function createTask(apiKey: string, options: NanoBanana2Options): Promise<
         prompt: options.prompt,
         image_urls: [options.imageUrl],
         image_size: options.aspectRatio || "auto",
-        output_format: (options.outputFormat || "jpeg").toLowerCase(), // Normalize: "JPG" → "jpg"
+        // output_format: (options.outputFormat || "jpeg").toLowerCase(), // Normalize: "JPG" → "jpg"
       },
     },
     {

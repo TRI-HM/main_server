@@ -175,7 +175,7 @@ NODE_ENV=production
 
 ```bash
 cd /var/www/wonderfarm/backend
-bash deploy.sh
+sudo bash deploy.sh
 ```
 
 Deploy script se:
@@ -220,6 +220,7 @@ npm run build
 
 # Rsync len VPS
 rsync -avz --delete ./out/ theon@27.71.25.22:/var/www/wonderfarm/frontend/main/
+scp -r ./out/* theon@27.71.25.22:/var/www/wonderfarm/frontend/main/
 ```
 
 ### Deploy demo site

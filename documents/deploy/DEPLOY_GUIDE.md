@@ -175,7 +175,7 @@ NODE_ENV=production
 
 ```bash
 cd /var/www/wonderfarm/backend
-bash deploy.sh
+sudo bash deploy.sh
 ```
 
 Deploy script se:

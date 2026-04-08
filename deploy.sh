@@ -1,22 +1,31 @@
 #!/bin/bash
 # deploy.sh - Production deployment script
+# Directory structure:
+#   /var/www/wonderfarm/
+#   ├── frontend/out/    # Next.js static export (rsync from local)
+#   └── backend/         # This project (Node Express + Docker)
+
+set -e
 
 echo "🚀 Starting production deployment..."
 
 # Variables
-PROJECT_DIR="/opt/main_server"
-BACKUP_DIR="/opt/backups"
-APP_NAME="main_server"
+BASE_DIR="/var/www/wonderfarm"
+BACKEND_DIR="$BASE_DIR/backend"
+FRONTEND_DIR="$BASE_DIR/frontend"
+BACKUP_DIR="/var/www/backups"
 
-# Create backup directory
-mkdir -p $BACKUP_DIR
+# Create directories
+mkdir -p "$BACKUP_DIR"
+mkdir -p "$FRONTEND_DIR/out"
+mkdir -p "$BACKEND_DIR/uploads"
 
 # Function to check if containers are running
 check_health() {
     local container=$1
     local retries=30
     local count=0
-    
+
     echo "🔍 Checking health of $container..."
     while [ $count -lt $retries ]; do
         if docker compose ps $container | grep -q "healthy\|running"; then
@@ -27,22 +36,25 @@ check_health() {
         sleep 10
         ((count++))
     done
-    
+
     echo "❌ $container failed to start properly"
     return 1
 }
 
-# Backup current deployment
-if [ -d "$PROJECT_DIR" ]; then
+# Backup current backend deployment
+if [ -d "$BACKEND_DIR/src" ]; then
     echo "💾 Creating backup..."
-    tar -czf "$BACKUP_DIR/backup-$(date +%Y%m%d_%H%M%S).tar.gz" -C "$PROJECT_DIR" .
-    
+    tar -czf "$BACKUP_DIR/backend-$(date +%Y%m%d_%H%M%S).tar.gz" \
+        --exclude='node_modules' \
+        --exclude='uploads' \
+        -C "$BACKEND_DIR" .
+
     # Keep only last 5 backups
-    ls -t $BACKUP_DIR/backup-*.tar.gz | tail -n +6 | xargs -r rm
+    ls -t "$BACKUP_DIR"/backend-*.tar.gz 2>/dev/null | tail -n +6 | xargs -r rm
 fi
 
-# Navigate to project directory
-cd $PROJECT_DIR
+# Navigate to backend directory
+cd "$BACKEND_DIR"
 
 # Pull latest changes (if using git)
 if [ -d ".git" ]; then
@@ -79,22 +91,17 @@ docker compose up -d app
 # Wait for application to be ready
 if ! check_health "app"; then
     echo "❌ Application failed to start. Rolling back..."
-    
+
     # Rollback: restore from backup if available
-    latest_backup=$(ls -t $BACKUP_DIR/backup-*.tar.gz 2>/dev/null | head -n 1)
+    latest_backup=$(ls -t "$BACKUP_DIR"/backend-*.tar.gz 2>/dev/null | head -n 1)
     if [ -n "$latest_backup" ]; then
         echo "🔄 Rolling back to latest backup..."
         docker compose down
-        rm -rf $PROJECT_DIR/*
-        tar -xzf "$latest_backup" -C "$PROJECT_DIR"
+        tar -xzf "$latest_backup" -C "$BACKEND_DIR"
         docker compose up -d
     fi
     exit 1
 fi
-
-# Run database migrations
-echo "🔄 Running database migrations..."
-docker compose exec app npx sequelize-cli db:migrate
 
 # Check final status
 echo "🔍 Final health check..."
@@ -116,5 +123,8 @@ df -h
 echo "📝 Recent application logs:"
 docker compose logs --tail=20 app
 
+echo ""
 echo "✅ Deployment completed successfully!"
-echo "🌐 Application is available at: http://171.244.201.165:9456"
+echo "📂 Frontend: $FRONTEND_DIR/out/"
+echo "📂 Backend:  $BACKEND_DIR/"
+echo "🌐 Backend API: http://127.0.0.1:9456"

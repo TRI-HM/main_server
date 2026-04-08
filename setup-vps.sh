@@ -1,5 +1,11 @@
 #!/bin/bash
 # setup-vps.sh - Script to optimize CentOS 7.9 for 3GB RAM deployment
+# Directory structure:
+#   /var/www/wonderfarm/
+#   ├── frontend/out/    # Next.js static export
+#   └── backend/         # Node Express + Docker
+
+set -e
 
 echo "🚀 Setting up VPS optimization for 3GB RAM..."
 
@@ -10,7 +16,12 @@ sudo yum install -y epel-release
 
 # Install essential tools
 echo "🛠️ Installing essential tools..."
-sudo yum install -y htop nano wget curl git
+sudo yum install -y htop nano wget curl git rsync
+
+# Install Nginx
+echo "🌐 Installing Nginx..."
+sudo yum install -y nginx
+sudo systemctl enable nginx
 
 # Install Docker
 echo "🐳 Installing Docker..."
@@ -77,10 +88,37 @@ EOF
 
 sudo systemctl restart docker
 
-# Create deployment directory
-echo "📁 Creating deployment directory..."
-mkdir -p /opt/main_server
-sudo chown $USER:$USER /opt/main_server
+# Create project directories
+echo "📁 Creating project directories..."
+sudo mkdir -p /var/www/wonderfarm/frontend/main
+sudo mkdir -p /var/www/wonderfarm/frontend/demo
+sudo mkdir -p /var/www/wonderfarm/backend/uploads
+sudo mkdir -p /var/www/backups
+sudo chown -R $USER:$USER /var/www/wonderfarm
+sudo chown -R $USER:$USER /var/www/backups
+
+# Configure Nginx - copy config files from documents/deploy/
+echo "🌐 Configuring Nginx..."
+echo "⚠️  Copy nginx config files manually:"
+echo "    sudo mkdir -p /etc/nginx/snippets"
+echo "    sudo cp documents/deploy/wonderfarm-common.conf /etc/nginx/snippets/"
+echo "    sudo cp documents/deploy/wonderfarm.nginx.conf /etc/nginx/sites-available/wonderfarm"
+echo "    sudo ln -s /etc/nginx/sites-available/wonderfarm /etc/nginx/sites-enabled/"
+echo "    sudo rm -f /etc/nginx/sites-enabled/default"
+
+# Create sites-available/sites-enabled if not exist (CentOS uses conf.d by default)
+sudo mkdir -p /etc/nginx/sites-available
+sudo mkdir -p /etc/nginx/sites-enabled
+sudo mkdir -p /etc/nginx/snippets
+
+# Add sites-enabled include to nginx.conf if not present
+if ! grep -q "sites-enabled" /etc/nginx/nginx.conf; then
+    sudo sed -i '/include \/etc\/nginx\/conf.d/a\    include /etc/nginx/sites-enabled/*;' /etc/nginx/nginx.conf
+fi
+
+# Remove default nginx config
+sudo rm -f /etc/nginx/conf.d/default.conf
+sudo rm -f /etc/nginx/sites-enabled/default
 
 # Set up monitoring script
 echo "📊 Setting up monitoring script..."
@@ -140,14 +178,34 @@ sudo chmod +x /usr/local/bin/docker-cleanup.sh
 # Schedule cleanup weekly
 (crontab -l 2>/dev/null; echo "0 2 * * 0 /usr/local/bin/docker-cleanup.sh >> /var/log/docker-cleanup.log 2>&1") | crontab -
 
-echo "✅ VPS optimization completed!"
+echo ""
+echo "✅ VPS setup completed!"
 echo "📋 Summary:"
-echo "  - 4GB Swap file created"
+echo "  - Nginx installed and configured"
 echo "  - Docker installed and optimized"
+echo "  - 4GB Swap file created"
 echo "  - Resource monitoring enabled"
 echo "  - Automatic cleanup scheduled"
 echo ""
-echo "⚠️  Please reboot the system to apply all changes:"
-echo "   sudo reboot"
+echo "📂 Directory structure:"
+echo "  /var/www/wonderfarm/"
+echo "  ├── frontend/"
+echo "  │   ├── main/    # wonderfarmsieusaothanhmat.com"
+echo "  │   └── demo/    # demo.wonderfarmsieusaothanhmat.com"
+echo "  └── backend/     # git clone backend here"
 echo ""
-echo "📈 To monitor resources: htop or cat /var/log/resource-usage.log"
+echo "🚀 Next steps:"
+echo "  1. sudo reboot"
+echo "  2. Copy nginx configs:"
+echo "     sudo cp wonderfarm-common.conf /etc/nginx/snippets/"
+echo "     sudo cp wonderfarm.nginx.conf /etc/nginx/sites-available/wonderfarm"
+echo "     sudo ln -s /etc/nginx/sites-available/wonderfarm /etc/nginx/sites-enabled/"
+echo "     sudo nginx -t && sudo systemctl reload nginx"
+echo "  3. cd /var/www/wonderfarm/backend && git clone <repo-url> ."
+echo "  4. cp .env.example .env && nano .env"
+echo "  5. bash deploy.sh"
+echo "  6. rsync frontend builds:"
+echo "     rsync -avz ./out/ root@VPS:/var/www/wonderfarm/frontend/main/"
+echo "     rsync -avz ./out/ root@VPS:/var/www/wonderfarm/frontend/demo/"
+echo ""
+echo "📈 To monitor: htop or cat /var/log/resource-usage.log"

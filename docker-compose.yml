@@ -20,17 +20,17 @@ services:
       - DB_PASSWORD=Admin123
       - DB_DIALECT=mysql
       - PORT=9456
-      - NODE_OPTIONS=--max-old-space-size=300
+      - NODE_OPTIONS=--max-old-space-size=1536
     depends_on:
       db:
         condition: service_healthy
-    # Limit resources for 1GB RAM system
+    # Limit resources for 3GB RAM system
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 1G
         reservations:
-          memory: 200M
+          memory: 512M
     command: >
       sh -c "sleep 30 && npm start"
     restart: unless-stopped
@@ -45,13 +45,13 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-config.cnf:/etc/mysql/conf.d/custom.cnf:ro
-    # Limit MySQL resources for 1GB RAM
+    # Limit MySQL resources for 3GB RAM
     deploy:
       resources:
         limits:
-          memory: 450M
+          memory: 1G
         reservations:
-          memory: 300M
+          memory: 512M
     healthcheck:
       test:
         ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pAdmin123"]

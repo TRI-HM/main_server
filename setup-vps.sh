@@ -1,7 +1,7 @@
 #!/bin/bash
-# setup-vps.sh - Script to optimize CentOS 7.9 for 1GB RAM deployment
+# setup-vps.sh - Script to optimize CentOS 7.9 for 3GB RAM deployment
 
-echo "🚀 Setting up VPS optimization for 1GB RAM..."
+echo "🚀 Setting up VPS optimization for 3GB RAM..."
 
 # Update system
 echo "📦 Updating system packages..."
@@ -26,9 +26,9 @@ echo "🐙 Installing Docker Compose..."
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-# Create swap file (2GB swap for 1GB RAM)
+# Create swap file (4GB swap for 3GB RAM)
 echo "💾 Creating swap file..."
-sudo fallocate -l 2G /swapfile
+sudo fallocate -l 4G /swapfile
 sudo chmod 600 /swapfile
 sudo mkswap /swapfile
 sudo swapon /swapfile
@@ -142,7 +142,7 @@ sudo chmod +x /usr/local/bin/docker-cleanup.sh
 
 echo "✅ VPS optimization completed!"
 echo "📋 Summary:"
-echo "  - 2GB Swap file created"
+echo "  - 4GB Swap file created"
 echo "  - Docker installed and optimized"
 echo "  - Resource monitoring enabled"
 echo "  - Automatic cleanup scheduled"

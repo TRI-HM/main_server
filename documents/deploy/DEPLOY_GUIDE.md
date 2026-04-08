@@ -85,13 +85,61 @@ Script se tu dong:
 - Setup resource monitoring (cron 5 phut/lan)
 - Setup Docker cleanup (hang tuan)
 
-### 3. Cau hinh Nginx (neu can chinh sua)
+### 3. Cau hinh Nginx
+
+Co 2 file config can copy len VPS:
+
+- `wonderfarm.nginx.conf` → config chinh (server blocks)
+- `wonderfarm-common.conf` → config chung (gzip, security headers)
 
 ```bash
-sudo vi /etc/nginx/sites-available/wonderfarm
-sudo nginx -t
-sudo systemctl reload nginx
+# Tu may local — copy 2 file config len VPS
+scp documents/deploy/wonderfarm.nginx.conf theon@27.71.25.22:/tmp/wonderfarm
+scp documents/deploy/wonderfarm-common.conf theon@27.71.25.22:/tmp/wonderfarm-common.conf
 ```
+
+```bash
+# Tren VPS — cai dat config
+sudo mkdir -p /etc/nginx/snippets
+sudo cp /tmp/wonderfarm /etc/nginx/sites-available/wonderfarm
+sudo cp /tmp/wonderfarm-common.conf /etc/nginx/snippets/wonderfarm-common.conf
+
+# Tao symlink vao sites-enabled
+sudo ln -sf /etc/nginx/sites-available/wonderfarm /etc/nginx/sites-enabled/wonderfarm
+
+# Xoa default config (QUAN TRONG — neu khong se hien "Welcome to Nginx")
+sudo rm -f /etc/nginx/sites-enabled/default
+
+# Test va reload
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### 4. Cau hinh SSL (HTTPS)
+
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d wonderfarmsieusaothanhmat.com -d demo.wonderfarmsieusaothanhmat.com
+```
+
+### Luu y khi cap nhat Nginx config
+
+Khi can sua config, sua file trong repo roi copy lai len VPS:
+
+```bash
+# Tu may local
+scp documents/deploy/wonderfarm.nginx.conf theon@27.71.25.22:/tmp/wonderfarm
+scp documents/deploy/wonderfarm-common.conf theon@27.71.25.22:/tmp/wonderfarm-common.conf
+
+# Tren VPS
+sudo cp /tmp/wonderfarm /etc/nginx/sites-available/wonderfarm
+sudo cp /tmp/wonderfarm-common.conf /etc/nginx/snippets/wonderfarm-common.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+> **Loi thuong gap**: Neu `nginx -t` bao `pread() failed (21: Is a directory)` thi file
+> trong `sites-available` hoac `sites-enabled` bi tao thanh thu muc thay vi file.
+> Xoa bang `sudo rm -rf /etc/nginx/sites-enabled/wonderfarm /etc/nginx/sites-available/wonderfarm`
+> roi lam lai cac buoc o tren.
 
 ---
 

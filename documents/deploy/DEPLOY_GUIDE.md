@@ -1,6 +1,6 @@
 # Wonderfarm - Deploy Guide
 
-> VPS: CentOS 7.9 | RAM: 3GB | IP: 171.244.201.165
+> VPS: Ubuntu 24.04 | RAM: 3GB | IP: 171.244.201.165
 
 ## Directory Structure (VPS)
 

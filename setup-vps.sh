@@ -1,41 +1,46 @@
 #!/bin/bash
-# setup-vps.sh - Script to optimize CentOS 7.9 for 3GB RAM deployment
+# setup-vps.sh - Script to optimize Ubuntu 24.04 for 3GB RAM deployment
 # Directory structure:
 #   /var/www/wonderfarm/
-#   ├── frontend/out/    # Next.js static export
-#   └── backend/         # Node Express + Docker
+#   ├── frontend/
+#   │   ├── main/    # wonderfarmsieusaothanhmat.com
+#   │   └── demo/    # demo.wonderfarmsieusaothanhmat.com
+#   └── backend/     # Node Express + Docker
 
 set -e
 
-echo "🚀 Setting up VPS optimization for 3GB RAM..."
+echo "🚀 Setting up VPS optimization for 3GB RAM (Ubuntu 24.04)..."
 
 # Update system
 echo "📦 Updating system packages..."
-sudo yum update -y
-sudo yum install -y epel-release
+sudo apt update && sudo apt upgrade -y
 
 # Install essential tools
 echo "🛠️ Installing essential tools..."
-sudo yum install -y htop nano wget curl git rsync
+sudo apt install -y htop nano wget curl git rsync ufw
 
 # Install Nginx
 echo "🌐 Installing Nginx..."
-sudo yum install -y nginx
+sudo apt install -y nginx
 sudo systemctl enable nginx
 
-# Install Docker
+# Install Docker (official method for Ubuntu)
 echo "🐳 Installing Docker..."
-sudo yum install -y yum-utils device-mapper-persistent-data lvm2
-sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install -y docker-ce docker-ce-cli containerd.io
+sudo apt install -y ca-certificates gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $USER
-
-# Install Docker Compose
-echo "🐙 Installing Docker Compose..."
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
 
 # Create swap file (4GB swap for 3GB RAM)
 echo "💾 Creating swap file..."
@@ -106,19 +111,14 @@ echo "    sudo cp documents/deploy/wonderfarm.nginx.conf /etc/nginx/sites-availa
 echo "    sudo ln -s /etc/nginx/sites-available/wonderfarm /etc/nginx/sites-enabled/"
 echo "    sudo rm -f /etc/nginx/sites-enabled/default"
 
-# Create sites-available/sites-enabled if not exist (CentOS uses conf.d by default)
-sudo mkdir -p /etc/nginx/sites-available
-sudo mkdir -p /etc/nginx/sites-enabled
-sudo mkdir -p /etc/nginx/snippets
-
-# Add sites-enabled include to nginx.conf if not present
-if ! grep -q "sites-enabled" /etc/nginx/nginx.conf; then
-    sudo sed -i '/include \/etc\/nginx\/conf.d/a\    include /etc/nginx/sites-enabled/*;' /etc/nginx/nginx.conf
-fi
-
-# Remove default nginx config
-sudo rm -f /etc/nginx/conf.d/default.conf
+# Ubuntu 24.04 already has sites-available/sites-enabled/snippets
 sudo rm -f /etc/nginx/sites-enabled/default
+
+# Configure UFW firewall
+echo "🔒 Configuring UFW firewall..."
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw --force enable
 
 # Set up monitoring script
 echo "📊 Setting up monitoring script..."

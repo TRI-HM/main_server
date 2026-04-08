@@ -1,68 +1,50 @@
 import fs from "fs";
 import path from "path";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { generateFileNameWithTime } from "../../util/generateNameWithTime";
 
+const s3 = new S3Client({
+  region: "us-east-1",
+  endpoint: process.env.ENDPOINT_CLOUD_STORAGE,
+  credentials: {
+    accessKeyId: process.env.SECRET_NAME || "",
+    secretAccessKey: process.env.SECRET_KEY || "",
+  },
+  forcePathStyle: true,
+});
+
+const BUCKET = process.env.BUCKET_NAME || "main-server";
+
 /**
- * Upload buffer lên cloud (nếu cấu hình CLOUD_STORAGE_UPLOAD_URL) hoặc lưu local + trả URL công khai.
- *
- * CLOUD_STORAGE_UPLOAD_URL: POST multipart, field mặc định `file` (đổi bằng CLOUD_STORAGE_FILE_FIELD).
- * Response JSON cần có `url` hoặc `data.url` (tuỳ backend).
- * CLOUD_STORAGE_AUTH_HEADER: ví dụ `Bearer xxx` gửi kèm Authorization.
+ * Upload buffer lên ViettelIDC S3-compatible cloud storage hoặc lưu local nếu chưa cấu hình.
  */
 export async function uploadImageBufferToPublicUrl(
   buffer: Buffer,
   originalFilename: string,
   mimeType: string
 ): Promise<string> {
-  const endpoint = process.env.CLOUD_STORAGE_UPLOAD_URL?.trim();
+  const endpoint = process.env.ENDPOINT_CLOUD_STORAGE?.trim();
 
   if (endpoint) {
-    const field = process.env.CLOUD_STORAGE_FILE_FIELD || "file";
-    const form = new FormData();
-    form.append(field, new Blob([buffer], { type: mimeType }), originalFilename);
+    const safeBase = originalFilename.replace(/[^a-zA-Z0-9._-]/g, "_") || "image";
+    const key = `uploads/${generateFileNameWithTime()}-${safeBase}`;
 
-    const headers: Record<string, string> = {};
-    const auth = process.env.CLOUD_STORAGE_AUTH_HEADER?.trim();
-    if (auth) {
-      headers.Authorization = auth;
-    }
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: key,
+        Body: buffer,
+        ContentType: mimeType,
+        ACL: "public-read",
+      })
+    );
 
-    const res = await fetch(endpoint, {
-      method: "POST",
-      body: form,
-      headers,
-    });
-
-    const text = await res.text();
-    if (!res.ok) {
-      throw new Error(`Cloud upload failed: ${res.status} ${text}`);
-    }
-
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(text) as Record<string, unknown>;
-    } catch {
-      throw new Error("Cloud upload response is not JSON");
-    }
-
-    const obj = parsed as Record<string, unknown>;
-    const url =
-      (typeof obj.url === "string" && obj.url) ||
-      (typeof obj.data === "object" &&
-        obj.data !== null &&
-        typeof (obj.data as Record<string, unknown>).url === "string" &&
-        (obj.data as Record<string, unknown>).url) ||
-      (typeof obj.fileUrl === "string" && obj.fileUrl);
-
-    if (typeof url !== "string" || !url) {
-      throw new Error("Cloud upload response missing url");
-    }
-    return url;
+    return `${endpoint.replace(/\/$/, "")}/${BUCKET}/${key}`;
   }
 
   const baseUrl = process.env.BASE_URL?.replace(/\/$/, "");
   if (!baseUrl) {
-    throw new Error("BASE_URL is required when CLOUD_STORAGE_UPLOAD_URL is not set");
+    throw new Error("BASE_URL is required when ENDPOINT_CLOUD_STORAGE is not set");
   }
 
   const uploadsDir = path.join(process.cwd(), "public", "images", "uploads");

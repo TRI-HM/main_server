@@ -1,18 +1,20 @@
 # docker-compose.yml
-# This file is used to define and run multi-container Docker applications.
+# Deploy at: /var/www/wonderfarm/backend/
+# Nginx runs on host, proxies API requests to app:9456
 version: "3.8"
 
 services:
+  # Backend - Node Express API
   app:
     build: .
+    container_name: wonderfarm_app
     ports:
-      - "9456:9456"
+      - "127.0.0.1:9456:9456"
     volumes:
-      - /home/mysql/upload/images:/usr/src/app/public/images/uploads
+      - ./uploads:/usr/src/app/public/images/uploads
     env_file:
       - .env
     environment:
-      - BASE_URL=http://171.244.201.165:9456
       - DB_HOST=db
       - DB_PORT=3306
       - DB_NAME=main_server
@@ -20,58 +22,59 @@ services:
       - DB_PASSWORD=Admin123
       - DB_DIALECT=mysql
       - PORT=9456
-      - NODE_OPTIONS=--max-old-space-size=300
+      - NODE_OPTIONS=--max-old-space-size=512
     depends_on:
       db:
         condition: service_healthy
-    # Limit resources for 1GB RAM system
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 768M
         reservations:
-          memory: 200M
+          memory: 384M
     command: >
-      sh -c "sleep 30 && npm start"
+      sh -c "sleep 15 && npm start"
     restart: unless-stopped
 
+  # MySQL Database
   db:
     image: mysql:8.0
+    container_name: wonderfarm_db
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=Admin123
       - MYSQL_DATABASE=main_server
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql-config.cnf:/etc/mysql/conf.d/custom.cnf:ro
-    # Limit MySQL resources for 1GB RAM
     deploy:
       resources:
         limits:
-          memory: 450M
+          memory: 1G
         reservations:
-          memory: 300M
+          memory: 512M
     healthcheck:
       test:
         ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pAdmin123"]
       interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 30s
+      retries: 5
+      start_period: 60s
     restart: unless-stopped
 
+  # Uncomment to enable phpMyAdmin
   # phpmyadmin:
   #   image: phpmyadmin/phpmyadmin
-  #   container_name: phpmyadmin_container
-  #   restart: always
+  #   container_name: wonderfarm_phpmyadmin
   #   ports:
-  #     - "8080:80"
+  #     - "127.0.0.1:8080:80"
   #   environment:
   #     PMA_HOST: db
   #     MYSQL_ROOT_PASSWORD: Admin123
   #   depends_on:
   #     - db
+  #   restart: unless-stopped
 
 volumes:
   mysql_data:

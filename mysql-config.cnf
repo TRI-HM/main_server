@@ -1,4 +1,4 @@
-# MySQL Configuration for 1GB RAM VPS
+# MySQL Configuration for 3GB RAM VPS
 # Place this file as mysql-config.cnf
 
 [mysqld]
@@ -6,36 +6,36 @@
 default_authentication_plugin = mysql_native_password
 sql_mode = TRADITIONAL
 
-# Memory optimizations for 1GB RAM system
-# InnoDB buffer pool (most important setting) - use ~40% of available RAM for MySQL
-innodb_buffer_pool_size = 180M
+# Memory optimizations for 3GB RAM system
+# InnoDB buffer pool (most important setting) - since DB memory is limited to 1GB in docker
+innodb_buffer_pool_size = 512M
 innodb_buffer_pool_instances = 1
 
 # Log buffer
-innodb_log_buffer_size = 8M
-innodb_log_file_size = 32M
+innodb_log_buffer_size = 16M
+innodb_log_file_size = 64M
 
 # Query cache (for MySQL 5.7, disabled in 8.0 by default)
 # query_cache_size = 0
 # query_cache_type = 0
 
 # Connection limits
-max_connections = 50
-max_user_connections = 45
+max_connections = 150
+max_user_connections = 120
 
 # Thread cache
-thread_cache_size = 8
+thread_cache_size = 16
 
 # Table cache
-table_open_cache = 400
-table_definition_cache = 200
+table_open_cache = 800
+table_definition_cache = 400
 
 # Temporary tables
-tmp_table_size = 16M
-max_heap_table_size = 16M
+tmp_table_size = 32M
+max_heap_table_size = 32M
 
 # MyISAM settings (if used)
-key_buffer_size = 16M
+key_buffer_size = 32M
 
 # Binary logging (disable if not needed for replication)
 skip-log-bin

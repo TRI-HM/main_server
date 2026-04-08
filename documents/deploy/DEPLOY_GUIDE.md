@@ -108,7 +108,7 @@ git clone <repo-url> .
 
 ```bash
 cp .env.example .env
-nano .env
+vi .env
 ```
 
 Cac bien quan trong:
@@ -171,7 +171,7 @@ curl http://127.0.0.1:9456/api/health
 npm run build
 
 # Rsync len VPS
-rsync -avz --delete ./out/ root@171.244.201.165:/var/www/wonderfarm/frontend/main/
+rsync -avz --delete ./out/ theon@27.71.25.22:/var/www/wonderfarm/frontend/main/
 ```
 
 ### Deploy demo site
@@ -181,7 +181,7 @@ rsync -avz --delete ./out/ root@171.244.201.165:/var/www/wonderfarm/frontend/mai
 npm run build
 
 # Rsync len VPS
-rsync -avz --delete ./out/ root@171.244.201.165:/var/www/wonderfarm/frontend/demo/
+rsync -avz --delete ./out/ theon@27.71.25.22:/var/www/wonderfarm/frontend/demo/
 ```
 
 Khong can restart bat ky service nao — Nginx serve static files truc tiep.

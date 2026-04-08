@@ -88,7 +88,7 @@ Script se tu dong:
 ### 3. Cau hinh Nginx (neu can chinh sua)
 
 ```bash
-sudo nano /etc/nginx/sites-available/wonderfarm
+sudo vi /etc/nginx/sites-available/wonderfarm
 sudo nginx -t
 sudo systemctl reload nginx
 ```

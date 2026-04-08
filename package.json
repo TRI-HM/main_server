@@ -35,7 +35,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "start": "npx sequelize-cli db:migrate && node --max-old-space-size=300 -r ts-node/register src/app.ts",
+    "start": "node --max-old-space-size=300 -r ts-node/register src/app.ts",
     "start:prod": "NODE_ENV=production npm run start",
     "start:dev": "nodemon --exec \"node -r ts-node/register src/app.ts\"",
     "test:realEstate": "node --max-old-space-size=200 -r ts-node/register scripts/runTests.ts",

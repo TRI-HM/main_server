@@ -44,17 +44,19 @@ const httpServer = createServer(app);
 
 const PORT = process.env.PORT || 3000;
 
-const StartServer = () => {
-  SequelizeDB.authenticate()
-    .then(() => {
-      console.log('✅ Database connected successfully!');
-      httpServer.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-      });
-    })
-    .catch((err) => {
-      console.error('❌ Unable to connect to the database:', err);
-    }
-    );
+const StartServer = async () => {
+  try {
+    await SequelizeDB.authenticate();
+    console.log('✅ Database connected successfully!');
+
+    await SequelizeDB.sync({ alter: true });
+    console.log('✅ All tables synced successfully!');
+
+    httpServer.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('❌ Unable to connect to the database:', err);
+  }
 };
 StartServer();

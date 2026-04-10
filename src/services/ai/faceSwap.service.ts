@@ -48,10 +48,17 @@ interface TaskInfoResponse {
 }
 
 export interface FaceSwapOptions {
-  /** URL ảnh user (đã upload lên cloud storage) — đóng vai trò media gốc */
+  /** URL ảnh khuôn mặt user — sẽ được ghép vào ảnh target (Facemint to_face) */
   userImageUrl: string;
-  /** URL ảnh target face — khuôn mặt sẽ được ghép vào ảnh user */
-  targetFaceUrl: string;
+  /** URL ảnh target — ảnh gốc giữ nguyên nội dung, chỉ thay khuôn mặt (Facemint media_url) */
+  targetImageUrl: string;
+  /**
+   * URL ảnh crop khuôn mặt target — dùng để xác định CHÍNH XÁC mặt nào trong
+   * targetImageUrl cần được thay thế (Facemint from_face). Cần thiết khi target
+   * có nhiều người để tăng độ chính xác. Nếu omit, Facemint sẽ thay TẤT CẢ
+   * khuôn mặt trong target.
+   */
+  refFaceUrl?: string;
   /** Loại media: "image" | "gif" | "video" (mặc định: "image") */
   type?: "image" | "gif" | "video";
   /** Resolution: 1=480p, 2=720p, 3=1080p, 4=2K, 5=4K, 6=8K (mặc định: 3) */
@@ -70,9 +77,19 @@ async function createTask(apiKey: string, options: FaceSwapOptions): Promise<str
   const callbackUrl =
     process.env.FACEMINT_CALLBACK_URL || "https://example.com/facemint/callback";
 
+  // Neu refFaceUrl khong duoc cung cap, omit from_face — Facemint se thay
+  // TAT CA khuon mat trong media. Khi co refFaceUrl, Facemint chi thay dung
+  // khuon mat khop voi anh crop nay (huu ich khi target co nhieu nguoi).
+  const swapEntry: { from_face?: string; to_face: string } = {
+    to_face: options.userImageUrl,
+  };
+  if (options.refFaceUrl) {
+    swapEntry.from_face = options.refFaceUrl;
+  }
+
   const body = {
     type: options.type || "image",
-    media_url: options.targetFaceUrl,
+    media_url: options.targetImageUrl,
     start_time: 0,
     end_time: 0,
     resolution: options.resolution ?? 3,
@@ -82,12 +99,7 @@ async function createTask(apiKey: string, options: FaceSwapOptions): Promise<str
     face_detection: 0.25,
     watermark: "",
     callback_url: callbackUrl,
-    swap_list: [
-      {
-        from_face: options.targetFaceUrl,
-        to_face: options.userImageUrl,
-      },
-    ],
+    swap_list: [swapEntry],
   };
 
   console.log("[Facemint] createTask body:", JSON.stringify(body, null, 2));

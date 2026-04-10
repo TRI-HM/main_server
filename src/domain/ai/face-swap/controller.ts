@@ -77,15 +77,18 @@ async function compressImage(
  * POST /api/ai/face-swap/generate
  *
  * Body (multipart/form-data):
- *   - image: file ảnh user (required) — ảnh sẽ được giữ lại nội dung, chỉ đổi khuôn mặt
+ *   - image: file ảnh user (required) — khuôn mặt user sẽ được ghép vào target
  *   - name: tên cơ sở cho file (required, VD: "nguyen_van_a")
- *   - target_face: URL public của ảnh target face (required) — KHÔNG lưu lên cloud của server
+ *   - target_face: URL public của ảnh target (required) — ảnh gốc giữ nội dung, chỉ thay mặt; KHÔNG lưu lên cloud của server
+ *   - ref_face: URL public ảnh crop khuôn mặt trong target (optional) — dùng để
+ *               xác định chính xác mặt nào cần thay khi target có nhiều người.
+ *               Nếu omit, tất cả khuôn mặt trong target sẽ bị thay.
  *   - resolution: số 1-6 tương ứng 480p..8K (optional, default: 3 = 1080p)
  *   - enhance: 0 | 1 bật/tắt enhance khuôn mặt (optional, default: 1)
  */
 export const generate = wrapAsync(async (req: Request, res: Response) => {
   const file = req.file;
-  const { name, target_face, resolution, enhance } = req.body;
+  const { name, target_face, ref_face, resolution, enhance } = req.body;
 
   // --- Validate input ---
   if (!file?.buffer) {
@@ -143,11 +146,14 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
   // --- Bước 2: Gọi Facemint.io để thực hiện face swap ---
   const options: FaceSwapOptions = {
     userImageUrl: originalUrl,
-    targetFaceUrl: target_face,
+    targetImageUrl: target_face,
     type: "image",
     resolution: resolution ? Number(resolution) : undefined,
     enhance: enhance !== undefined ? Number(enhance) : undefined,
   };
+  if (ref_face) {
+    options.refFaceUrl = ref_face;
+  }
 
   const aiTempUrl = await faceSwap(apiKey, options);
 

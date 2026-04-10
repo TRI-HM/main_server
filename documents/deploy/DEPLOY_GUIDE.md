@@ -114,6 +114,12 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
+==> thay cấu hình thì đăng ký lại
+
+``` bash
+sudo certbot --nginx -d wonderfarmsieusaothanhmat.com -d demo.wonderfarmsieusaothanhmat.com
+```
+
 ### 4. Cau hinh SSL (HTTPS)
 
 ```bash

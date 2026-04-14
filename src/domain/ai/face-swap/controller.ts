@@ -29,6 +29,38 @@ import {
   updateTaskRecord,
 } from "./taskStore";
 
+// ---------------------------------------------------------------------------
+// Facemint API Key Pool — round-robin across multiple accounts
+// Env vars: FACEMINT_API_KEY_1, FACEMINT_API_KEY_2, ...
+// Fallback:  FACEMINT_API_KEY (single key, backwards compatible)
+// ---------------------------------------------------------------------------
+const _facemintKeys: string[] = (() => {
+  const keys: string[] = [];
+  for (let i = 1; ; i++) {
+    const k = process.env[`FACEMINT_API_KEY_${i}`];
+    if (!k) break;
+    keys.push(k);
+  }
+  if (keys.length === 0 && process.env.FACEMINT_API_KEY) {
+    keys.push(process.env.FACEMINT_API_KEY);
+  }
+  return keys;
+})();
+
+let _keyIndex = 0;
+
+/** Trả về API key tiếp theo theo round-robin. Throw nếu chưa cấu hình key nào. */
+function getNextApiKey(): string {
+  if (_facemintKeys.length === 0) {
+    throw new Error(
+      "Chưa cấu hình Facemint API key. Đặt FACEMINT_API_KEY_1 / FACEMINT_API_KEY_2 (hoặc FACEMINT_API_KEY)."
+    );
+  }
+  const key = _facemintKeys[_keyIndex % _facemintKeys.length];
+  _keyIndex = (_keyIndex + 1) % _facemintKeys.length; // reset để tránh overflow dài hạn
+  return key;
+}
+
 /** Nén ảnh xuống kích thước mục tiêu (mặc định ~200KB) */
 async function compressImage(
   buffer: Buffer,
@@ -178,8 +210,10 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     return;
   }
 
-  const apiKey = process.env.FACEMINT_API_KEY;
-  if (!apiKey) {
+  let apiKey: string;
+  try {
+    apiKey = getNextApiKey();
+  } catch {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(
       ioCustom.toResponseError({
         code: StatusCodes.INTERNAL_SERVER_ERROR,

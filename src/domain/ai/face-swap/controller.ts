@@ -1,22 +1,33 @@
 /**
- * Controller cho Face Swap — AI hoán đổi khuôn mặt từ ảnh user sang target_face.
+ * Controller cho Face Swap (async flow) — AI hoán đổi khuôn mặt.
  *
- * Luồng xử lý của endpoint POST /generate:
- *   1. Nhận ảnh upload từ client (multipart form-data field "image") + name + target_face URL
- *   2. Nén ảnh user rồi upload lên cloud storage: {baseName}-original.jpg
- *   3. Gọi Facemint.io Face Swap API với media_url = ảnh user, to_face = target_face URL
- *   4. Download ảnh kết quả, nén rồi upload lên cloud storage: {baseName}-generated.jpg
- *   5. Trả về 2 URL cho client (KHÔNG lưu target_face — client tự quản lý)
+ * Flow:
+ *   POST /generate            → tạo task, trả taskId NGAY (không chờ Facemint)
+ *   GET  /status/:taskId      → client poll endpoint này để biết tiến độ
+ *
+ * Background worker:
+ *   Sau khi trả taskId, server tự poll Facemint → download ảnh kết quả
+ *   → upload lên S3 → cập nhật task trong store.
  */
 
 import { Request, Response } from "express";
 import axios from "axios";
 import sharp from "sharp";
+import { randomUUID } from "crypto";
 import { StatusCodes } from "http-status-codes";
 import { wrapAsync } from "../../../util/wrapAsync";
 import ioCustom from "../../../util/ioCustom";
 import { uploadImageBufferToPublicUrl } from "../../../services/storage/cloudStorage.service";
-import { faceSwap, FaceSwapOptions } from "../../../services/ai/faceSwap.service";
+import {
+  createFacemintTask,
+  pollFacemintTask,
+  FaceSwapOptions,
+} from "../../../services/ai/faceSwap.service";
+import {
+  createTaskRecord,
+  getTaskRecord,
+  updateTaskRecord,
+} from "./taskStore";
 
 /** Nén ảnh xuống kích thước mục tiêu (mặc định ~200KB) */
 async function compressImage(
@@ -25,13 +36,11 @@ async function compressImage(
 ): Promise<{ buffer: Buffer; mimetype: string }> {
   const targetBytes = targetSizeKB * 1024;
 
-  // Nếu ảnh đã nhỏ hơn mục tiêu, trả về nguyên bản dạng jpeg
   if (buffer.length <= targetBytes) {
     const output = await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
     return { buffer: output, mimetype: "image/jpeg" };
   }
 
-  // Ước lượng quality dựa trên tỷ lệ kích thước (bù hệ số phi tuyến)
   let quality = Math.round((targetBytes / buffer.length) * 100 * 1.8);
   quality = Math.max(20, Math.min(quality, 92));
 
@@ -39,7 +48,6 @@ async function compressImage(
     .jpeg({ quality, mozjpeg: true })
     .toBuffer();
 
-  // Nếu vẫn còn lớn, giảm quality dần
   while (output.length > targetBytes && quality > 20) {
     quality -= 5;
     output = await sharp(buffer)
@@ -47,7 +55,6 @@ async function compressImage(
       .toBuffer();
   }
 
-  // Nếu quá nhỏ so với mục tiêu, tăng quality dần để tận dụng dung lượng
   while (output.length < targetBytes * 0.7 && quality < 92) {
     quality += 5;
     output = await sharp(buffer)
@@ -55,7 +62,6 @@ async function compressImage(
       .toBuffer();
   }
 
-  // Nếu vẫn còn lớn, resize nhỏ lại
   if (output.length > targetBytes) {
     const metadata = await sharp(buffer).metadata();
     const scale = Math.sqrt(targetBytes / output.length);
@@ -74,23 +80,84 @@ async function compressImage(
 }
 
 /**
+ * Background worker — chạy fire-and-forget sau khi /generate trả response.
+ * Poll Facemint → download → upload S3 → update store.
+ */
+async function processFaceSwapTask(params: {
+  taskId: string;
+  apiKey: string;
+  options: FaceSwapOptions;
+  baseName: string;
+}) {
+  const { taskId, apiKey, options, baseName } = params;
+
+  try {
+    const facemintTaskId = await createFacemintTask(apiKey, options);
+    updateTaskRecord(taskId, {
+      facemintTaskId,
+      status: "processing",
+    });
+
+    const aiTempUrl = await pollFacemintTask(apiKey, facemintTaskId, {
+      timeoutMs: 300_000,
+      onProgress: ({ state, process: pct }) => {
+        if (pct !== undefined) {
+          updateTaskRecord(taskId, { progress: pct });
+        }
+        console.log(
+          `[FaceSwap ${taskId}] Facemint state=${state} progress=${pct ?? "?"}`
+        );
+      },
+    });
+
+    console.log(`[FaceSwap ${taskId}] Downloading result from:`, aiTempUrl);
+    const aiImageResponse = await axios.get<ArrayBuffer>(aiTempUrl, {
+      responseType: "arraybuffer",
+      timeout: 60000,
+    });
+    const aiBuffer = Buffer.from(aiImageResponse.data);
+
+    const compressedAi = await compressImage(aiBuffer, 500);
+    const generatedFileName = `${baseName}-generated.jpg`;
+    const generatedUrl = await uploadImageBufferToPublicUrl(
+      compressedAi.buffer,
+      generatedFileName,
+      compressedAi.mimetype
+    );
+
+    updateTaskRecord(taskId, {
+      status: "done",
+      generatedUrl,
+      progress: 100,
+    });
+    console.log(`[FaceSwap ${taskId}] Done. generatedUrl=${generatedUrl}`);
+  } catch (err: any) {
+    const message = err?.message || String(err);
+    console.error(`[FaceSwap ${taskId}] Failed:`, message);
+    updateTaskRecord(taskId, {
+      status: "failed",
+      error: message,
+    });
+  }
+}
+
+/**
  * POST /api/ai/face-swap/generate
+ * Multipart body:
+ *   - image: file ảnh user (required)
+ *   - name: tên cơ sở file (required)
+ *   - target_face: URL ảnh target (required)
+ *   - ref_face: URL crop mặt target (optional)
+ *   - resolution: 1..6 (optional, default 3)
+ *   - enhance: 0 | 1 (optional, default 1)
  *
- * Body (multipart/form-data):
- *   - image: file ảnh user (required) — khuôn mặt user sẽ được ghép vào target
- *   - name: tên cơ sở cho file (required, VD: "nguyen_van_a")
- *   - target_face: URL public của ảnh target (required) — ảnh gốc giữ nội dung, chỉ thay mặt; KHÔNG lưu lên cloud của server
- *   - ref_face: URL public ảnh crop khuôn mặt trong target (optional) — dùng để
- *               xác định chính xác mặt nào cần thay khi target có nhiều người.
- *               Nếu omit, tất cả khuôn mặt trong target sẽ bị thay.
- *   - resolution: số 1-6 tương ứng 480p..8K (optional, default: 3 = 1080p)
- *   - enhance: 0 | 1 bật/tắt enhance khuôn mặt (optional, default: 1)
+ * Trả về 202 Accepted: { taskId, originalUrl, baseName, status: "pending" }
+ * Client tiếp tục gọi GET /status/:taskId để lấy kết quả.
  */
 export const generate = wrapAsync(async (req: Request, res: Response) => {
   const file = req.file;
   const { name, target_face, ref_face, resolution, enhance } = req.body;
 
-  // --- Validate input ---
   if (!file?.buffer) {
     res.status(StatusCodes.BAD_REQUEST).json(
       ioCustom.toResponseError({
@@ -122,7 +189,6 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     return;
   }
 
-  // --- Chuẩn hoá tên file ---
   const safeName = name
     .trim()
     .normalize("NFD")
@@ -131,10 +197,9 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     .replace(/Đ/g, "D")
     .replace(/\s+/g, "_")
     .replace(/[^a-zA-Z0-9_-]/g, "");
-  console.log("Safe name:", safeName);
-  const baseName = `${safeName}`;
+  const baseName = safeName;
 
-  // --- Bước 1: Nén ảnh user rồi upload lên cloud storage ---
+  // Nén + upload ảnh user (đồng bộ — nhanh, ~1-2s, cần xong để có URL gửi Facemint)
   const compressed = await compressImage(file.buffer, 200);
   const originalFileName = `${baseName}-original.jpg`;
   const originalUrl = await uploadImageBufferToPublicUrl(
@@ -143,7 +208,7 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     compressed.mimetype
   );
 
-  // --- Bước 2: Gọi Facemint.io để thực hiện face swap ---
+  const taskId = randomUUID();
   const options: FaceSwapOptions = {
     userImageUrl: originalUrl,
     targetImageUrl: target_face,
@@ -151,35 +216,58 @@ export const generate = wrapAsync(async (req: Request, res: Response) => {
     resolution: resolution ? Number(resolution) : undefined,
     enhance: enhance !== undefined ? Number(enhance) : undefined,
   };
-  if (ref_face) {
-    options.refFaceUrl = ref_face;
+  if (ref_face) options.refFaceUrl = ref_face;
+
+  createTaskRecord({
+    taskId,
+    facemintTaskId: "",
+    status: "pending",
+    originalUrl,
+    baseName,
+  });
+
+  // Fire-and-forget — background worker
+  processFaceSwapTask({ taskId, apiKey, options, baseName }).catch((err) => {
+    console.error(`[FaceSwap ${taskId}] Unhandled worker error:`, err);
+  });
+
+  res.status(StatusCodes.ACCEPTED).json(
+    ioCustom.toResponse(StatusCodes.ACCEPTED, "Task đã được khởi tạo", {
+      taskId,
+      status: "pending",
+      originalUrl,
+      baseName,
+    })
+  );
+});
+
+/**
+ * GET /api/ai/face-swap/status/:taskId
+ * Trả về trạng thái hiện tại của task — client poll endpoint này.
+ */
+export const getStatus = wrapAsync(async (req: Request, res: Response) => {
+  const { taskId } = req.params;
+  const task = getTaskRecord(taskId);
+
+  if (!task) {
+    res.status(StatusCodes.NOT_FOUND).json(
+      ioCustom.toResponseError({
+        code: StatusCodes.NOT_FOUND,
+        message: "Task không tồn tại hoặc đã hết hạn.",
+      })
+    );
+    return;
   }
 
-  const aiTempUrl = await faceSwap(apiKey, options);
-
-  // --- Bước 3: Download ảnh kết quả và upload lên cloud storage ---
-  console.log("Downloading face swap result from:", aiTempUrl);
-  const aiImageResponse = await axios.get<ArrayBuffer>(aiTempUrl, {
-    responseType: "arraybuffer",
-    timeout: 60000,
-  });
-  const aiBuffer = Buffer.from(aiImageResponse.data);
-
-  // Nén ảnh kết quả xuống ~500KB trước khi upload
-  const compressedAi = await compressImage(aiBuffer, 500);
-  const generatedFileName = `${baseName}-generated.jpg`;
-  const generatedUrl = await uploadImageBufferToPublicUrl(
-    compressedAi.buffer,
-    generatedFileName,
-    compressedAi.mimetype
-  );
-
-  // --- Trả về kết quả (target_face KHÔNG được lưu) ---
   res.status(StatusCodes.OK).json(
-    ioCustom.toResponse(StatusCodes.OK, "Face swap thành công", {
-      originalUrl,
-      generatedUrl,
-      baseName,
+    ioCustom.toResponse(StatusCodes.OK, "OK", {
+      taskId: task.taskId,
+      status: task.status,
+      progress: task.progress,
+      originalUrl: task.originalUrl,
+      generatedUrl: task.generatedUrl,
+      baseName: task.baseName,
+      error: task.error,
     })
   );
 });

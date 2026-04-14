@@ -1,10 +1,11 @@
 /**
  * Service gọi Facemint.io Face Swap API để hoán đổi khuôn mặt.
  *
- * Luồng hoạt động:
- *   1. createTask() — gửi media_url + swap_list tới Facemint, nhận về taskId
- *   2. pollTaskResult() — poll POST /api/get-task-info cho đến khi state = 3 (success)
- *   3. faceSwap() — kết hợp cả 2 bước trên, trả về URL ảnh đã swap
+ * Exports:
+ *   - createFacemintTask() — gửi media_url + swap_list tới Facemint, nhận về taskId
+ *   - pollFacemintTask()   — poll POST /api/get-task-info cho đến khi state = 3 (success)
+ *
+ * Controller sẽ orchestrate 2 hàm này trong background worker (xem face-swap/controller.ts).
  *
  * API docs:
  *   - https://facemint.io/face-swap-api/create-face-swap-task
@@ -15,8 +16,6 @@ import axios from "axios";
 
 const FACEMINT_BASE_URL = "https://api.facemint.io/api";
 
-/** Thời gian chờ tối đa khi poll kết quả (ms) */
-const POLL_TIMEOUT = 120_000; // 2 phút
 /** Khoảng cách giữa mỗi lần poll (ms) */
 const POLL_INTERVAL = 3_000; // 3 giây
 
@@ -71,7 +70,10 @@ export interface FaceSwapOptions {
  * Gửi yêu cầu tạo face swap task tới Facemint.io.
  * Trả về taskId để poll kết quả sau.
  */
-async function createTask(apiKey: string, options: FaceSwapOptions): Promise<string> {
+export async function createFacemintTask(
+  apiKey: string,
+  options: FaceSwapOptions
+): Promise<string> {
   // callback_url la field required va phai la URL hop le — API reject neu rong.
   // Ta van dung polling qua /get-task-info nen callback chi la placeholder.
   const callbackUrl =
@@ -140,14 +142,29 @@ async function createTask(apiKey: string, options: FaceSwapOptions): Promise<str
   }
 }
 
+export interface PollOptions {
+  /** Timeout tối đa (ms) — mặc định 300_000 (5 phút) */
+  timeoutMs?: number;
+  /** Khoảng cách giữa các lần poll (ms) — mặc định 3_000 */
+  intervalMs?: number;
+  /** Callback mỗi lần nhận state từ Facemint (dùng để update progress vào store) */
+  onProgress?: (info: { state: number; process?: number }) => void;
+}
+
 /**
  * Poll POST /api/get-task-info cho đến khi task hoàn thành hoặc timeout.
  * Trả về URL ảnh kết quả (file_url).
  */
-async function pollTaskResult(apiKey: string, taskId: string): Promise<string> {
+export async function pollFacemintTask(
+  apiKey: string,
+  taskId: string,
+  opts: PollOptions = {}
+): Promise<string> {
+  const timeoutMs = opts.timeoutMs ?? 300_000;
+  const intervalMs = opts.intervalMs ?? POLL_INTERVAL;
   const startTime = Date.now();
 
-  while (Date.now() - startTime < POLL_TIMEOUT) {
+  while (Date.now() - startTime < timeoutMs) {
     const response = await axios.post<TaskInfoResponse>(
       `${FACEMINT_BASE_URL}/get-task-info`,
       { task_id: taskId },
@@ -159,7 +176,8 @@ async function pollTaskResult(apiKey: string, taskId: string): Promise<string> {
       }
     );
 
-    const { state, result } = response.data.data;
+    const { state, result, process: processPct } = response.data.data;
+    opts.onProgress?.({ state, process: processPct });
 
     if (state === 3) {
       const fileUrl = result?.file_url;
@@ -177,20 +195,9 @@ async function pollTaskResult(apiKey: string, taskId: string): Promise<string> {
       throw new Error(`Facemint task bị hủy (state=2, taskId: ${taskId})`);
     }
 
-    // state: 0 (pending) | 1 (processing) → chờ rồi poll lại
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+    await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
 
-  throw new Error(`Facemint task timeout sau ${POLL_TIMEOUT / 1000}s (taskId: ${taskId})`);
+  throw new Error(`Facemint task timeout sau ${timeoutMs / 1000}s (taskId: ${taskId})`);
 }
 
-/**
- * Hàm chính — thực hiện face swap từ ảnh user sang target face.
- *
- * @returns URL ảnh kết quả từ Facemint (tạm thời, cần download và lưu lên cloud riêng)
- */
-export async function faceSwap(apiKey: string, options: FaceSwapOptions): Promise<string> {
-  const taskId = await createTask(apiKey, options);
-  const resultUrl = await pollTaskResult(apiKey, taskId);
-  return resultUrl;
-}

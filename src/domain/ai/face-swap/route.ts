@@ -1,20 +1,20 @@
 /**
- * Route cho Face Swap AI — hoán đổi khuôn mặt từ ảnh user sang target_face.
+ * Route cho Face Swap AI (async flow).
  *
  * Endpoints:
- *   POST /api/ai/face-swap/generate
- *     - multipart/form-data: image (file), name (string), target_face (URL string)
- *     - Optional body: resolution (1..6), enhance (0 | 1)
- *     - Trả về: { originalUrl, generatedUrl, baseName }
+ *   POST /api/ai/face-swap/generate          → tạo task, trả taskId ngay (202)
+ *   GET  /api/ai/face-swap/status/:taskId    → client poll để lấy kết quả
+ *
+ * Xem CLIENT_SPEC.md trong cùng thư mục để biết cách frontend cần tích hợp.
  */
 
 import { Router } from "express";
-import { generate } from "./controller";
+import { generate, getStatus } from "./controller";
 import { uploadImageMemory } from "../../../util/multherMemory";
 
 const router = Router();
 
-// uploadImageMemory: lưu ảnh vào memory buffer → controller upload lên cloud
 router.post("/generate", uploadImageMemory.single("image"), generate);
+router.get("/status/:taskId", getStatus);
 
 export default router;
